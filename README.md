@@ -6,9 +6,7 @@ The WetNet Community Edition (WetNet CE) software is composed by two different p
 
 The general architecture of Wetnet CE is represented in the following picture.
 
-<center>
 ![Wetnet-Architecture](imgs/architecture.png)
-</center>
 
 where the Web Application is the user front end of the WSS.
 
@@ -107,9 +105,7 @@ Tomcat will deploy the .war and create a `ROOT` folder.
 Connect with a browser to the address https://IP:8443/wetnet/welcome, (where `IP` is the actual server IP). If a security exception is raised add the website to the trusted websites. <br>
 At this point you should see the WetNet CE Home Page, as in the following picture.
 
-<center>
 ![Wetnet-Home-Page](imgs/home_page.png)
-</center>
 
  Login with default credentials:  `admin` as username and `admin` as password.<br>
 Remember to change the credentials after your first login.
