@@ -6,7 +6,9 @@ The WetNet Community Edition (WetNet CE) software is composed by two different p
 
 The general architecture of Wetnet CE is represented in the following picture.
 
-![WetnetArchitecture](imgs/architecture.png)
+<center>
+![Wetnet-Architecture](imgs/architecture.png)
+</center>
 
 where the Web Application is the user front end of the WSS.
 
@@ -106,7 +108,7 @@ Connect with a browser to the address https://IP:8443/wetnet/welcome, (where `IP
 At this point you should see the WetNet CE Home Page, as in the following picture.
 
 <center>
-![Wetnet Home Page](imgs/home_page.png)
+![Wetnet-Home-Page](imgs/home_page.png)
 </center>
 
  Login with default credentials:  `admin` as username and `admin` as password.<br>
