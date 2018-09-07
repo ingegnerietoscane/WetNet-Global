@@ -6,9 +6,7 @@ The WetNet Community Edition (WetNet CE) software is composed by two different p
 
 The general architecture of Wetnet CE is represented in the following picture.
 
-<center>
-[Wetnet Architecture](imgs/architecture.png)
-</center>
+![WetnetArchitecture](imgs/architecture.png)
 
 where the Web Application is the user front end of the WSS.
 
