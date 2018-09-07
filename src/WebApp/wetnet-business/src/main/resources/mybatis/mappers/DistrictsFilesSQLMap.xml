@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="districtsFiles">
+
+    <resultMap id="resultMap" type="net.wedjaa.wetnet.business.domain.DistrictsFiles">
+         <result property="idFile" column="iddistricts_files" />
+         <result property="loadTimestamp" column="load_timestamp" />
+         <result property="file" javaType="_byte[]" column="file"/>
+         <result property="fileName" column="file_name" />
+         <result property="fileUri" column="file_uri" />
+         <result property="fileHash" column="file_hash" />
+         <result property="description" column="description" />
+         <result property="idDistricts" column="districts_id_districts" />
+    </resultMap>
+        
+	
+	<insert id="insert" parameterType="net.wedjaa.wetnet.business.domain.DistrictsFiles" useGeneratedKeys="true" keyProperty="iddistricts_files">
+		insert into districts_files (load_timestamp, file, file_name, file_uri, file_hash, description, districts_id_districts)
+		values (#{loadTimestamp}, #{file}, #{fileName}, #{fileUri}, #{fileHash}, #{description}, #{idDistricts})
+	</insert>
+
+	<select id="getAllFilesByDistrict" resultMap="resultMap">
+        SELECT * FROM districts_files WHERE districts_id_districts = #{idDistricts};
+    </select>
+    
+    <select id="getFileById" resultMap="resultMap">
+        SELECT * FROM districts_files WHERE iddistricts_files = #{idFile};
+    </select>
+    
+</mapper>

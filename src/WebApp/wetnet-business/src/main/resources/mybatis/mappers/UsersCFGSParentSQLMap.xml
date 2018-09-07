@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="userscfgsparent">
+
+    <resultMap id="resultMap" type="net.wedjaa.wetnet.business.domain.UsersCFGSParent">
+        <result property="save_date" column="save_date" />
+        <result property="menu_function" column="menu_function" />
+        <result property="submenu_function" column="submenu_function" />
+        <result property="description" column="description" />
+        <result property="time_base" column="time_base" />
+        <result property="granularity" column="granularity" />
+        <result property="users_idusers" column="users_idusers" />
+    </resultMap>
+	
+	
+	<insert id="insertConfiguration" parameterType="net.wedjaa.wetnet.business.domain.UsersCFGSParent">
+		insert into users_cfgs_parent (save_date, menu_function, submenu_function, description, time_base, granularity, users_idusers)
+    	values (#{save_date}, #{menu_function}, #{submenu_function}, #{description}, #{time_base}, #{granularity}, #{users_idusers})
+	</insert>
+	
+	<select id="getById" resultMap="resultMap" parameterType="net.wedjaa.wetnet.business.domain.UsersCFGSParent">
+    	SELECT * FROM users_cfgs_parent where users_idusers = #{users_idusers} AND menu_function = #{menu_function} AND submenu_function = #{submenu_function}
+    </select>
+	
+	<delete id="removeConfiguration" parameterType="java.util.Date">
+  		delete from users_cfgs_parent where save_date = #{save_date} 
+	</delete>
+	
+</mapper>

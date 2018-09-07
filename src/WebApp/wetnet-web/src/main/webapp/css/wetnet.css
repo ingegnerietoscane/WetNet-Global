@@ -1,0 +1,140 @@
+html {
+  position: relative;
+  min-height: 100%;
+}
+body {
+  /* Margin bottom by footer height */
+  margin-bottom: 30px;
+}
+
+.footer-logo {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 90px;
+  background-color: #f5f5f5;
+}
+
+.footer-logo div {
+	float: right;
+	margin-right: 10px;
+}
+
+.footer {
+  position: absolute;
+  bottom: -30;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 30px;
+  background-color: #f5f5f5;
+}
+
+.footer div {
+	float: right;
+	margin-right: 20px;
+}
+
+.area-grafico-g2{
+  width: 98%;
+  margin: 30px 0 auto;
+  background-color: white;
+  border-radius: 0px;
+}
+
+.area-grafico-g3{
+  width: 98%;
+  margin: 30px 0 auto;
+  background-color: white;
+  border-radius: 0px;
+}
+
+.area-grafico-g4{
+  width: 98%;
+  margin: 30px 0 auto 50px;
+  background-color: white;
+  border-radius: 0px;
+  padding-bottom: 50px;
+}
+
+.area-grafico-g5{
+  width: 98%;
+  margin: 30px 0 auto 50px;
+  background-color: white;
+  border-radius: 0px;
+  padding-bottom: 50px;
+}
+
+.area-grafico-g6{
+  width: 98%;
+  margin: 30px 0 auto 50px;
+  background-color: white;
+  border-radius: 0px;
+  padding-bottom: 50px;
+}
+
+.area-grafico-g7{
+  width: 98%;
+  margin: 30px 0 auto;
+  background-color: white;
+  border-radius: 0px;
+}
+
+.area-grafico-pie{
+  width: 98%;
+  margin: 30px 0 auto 50px;
+  background-color: white;
+  border-radius: 0px;
+  padding-bottom: 50px;
+}
+
+.area-grafico-scatter{
+  width: 98%;
+  margin: 30px 0 auto 50px;
+  background-color: white;
+  border-radius: 0px;
+  padding-bottom: 50px;
+}
+
+.area-grafico-gantt{
+  width: 98%;
+  margin: 30px 0 auto 100px;
+  background-color: white;
+  border-radius: 0px;
+  padding-bottom: 0px;
+}
+
+.area-grafico-cat{
+  width: 98%;
+  margin: 30px 0 auto 50px;
+  background-color: white;
+  border-radius: 0px;
+  padding-bottom: 50px;
+}
+
+.form-control{
+	font-size: 13px;
+}
+
+.wetnet-logo {
+	margin-top: -10px;
+}
+
+.errorblock {
+	background-color: red;
+	border-radius: 4px;
+	padding: 10px;
+}
+
+.wetnet-table-head th a {
+	display: block;
+  	height: 100%;
+  	width: 100%;
+	text-decoration: none;
+	color: black;
+}
+
+.wetnet-table-head th:hover {
+	background-color: #A9E0F7;
+}
+

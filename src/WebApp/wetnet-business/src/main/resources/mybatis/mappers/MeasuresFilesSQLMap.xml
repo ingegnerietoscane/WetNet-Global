@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="measuresFiles">
+
+    <resultMap id="resultMap" type="net.wedjaa.wetnet.business.domain.MeasuresFiles">
+         <result property="idFile" column="idmeasures_files" />
+         <result property="loadTimestamp" column="load_timestamp" />
+         <result property="file" column="file"/>
+         <result property="fileName" column="file_name" />
+         <result property="fileUri" column="file_uri" />
+         <result property="fileHash" column="file_hash" />
+         <result property="description" column="descriptions" />
+         <result property="idMeasures" column="measures_id_measures" />
+    </resultMap>
+        
+	
+	<insert id="insert" parameterType="net.wedjaa.wetnet.business.domain.MeasuresFiles" useGeneratedKeys="true" keyProperty="idmeasures_files">
+		insert into measures_files (load_timestamp, file, file_name, file_uri, file_hash, descriptions, measures_id_measures)
+		values (#{loadTimestamp}, #{file}, #{fileName}, #{fileUri}, #{fileHash}, #{description}, #{idMeasures})
+	</insert>
+	
+	<select id="getAllFilesByMeasure" resultMap="resultMap">
+        SELECT * FROM measures_files WHERE measures_id_measures = #{idMeasures};
+    </select>
+    
+    <select id="getFileById" resultMap="resultMap">
+        SELECT * FROM measures_files WHERE idmeasures_files = #{idFile};
+    </select>
+    
+</mapper>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="userscfgschild">
+
+    <resultMap id="resultMap" type="net.wedjaa.wetnet.business.domain.UsersCFGSChild">
+    	<result property="progressive" column="progressive" />
+        <result property="type" column="type" />
+        <result property="objectid" column="objectid" />
+        <result property="users_cfgs_parent_save_date" column="users_cfgs_parent_save_date" />
+        <result property="users_cfgs_parent_menu_function" column="users_cfgs_parent_menu_function" />
+        <result property="users_cfgs_parent_submenu_function" column="users_cfgs_parent_submenu_function" />
+        <result property="users_idusers" column="users_cfgs_parent_users_idusers" />
+    </resultMap>
+    
+    <insert id="insertChild" parameterType="net.wedjaa.wetnet.business.domain.UsersCFGSChild">
+		insert into users_cfgs_child (progressive, type, objectid, users_cfgs_parent_save_date, users_cfgs_parent_menu_function, users_cfgs_parent_submenu_function, users_cfgs_parent_users_idusers)
+    	values (#{progressive}, #{type}, #{objectid}, #{users_cfgs_parent_save_date}, #{users_cfgs_parent_menu_function}, #{users_cfgs_parent_submenu_function}, #{users_idusers})
+	</insert>
+
+	<select id="getById" resultMap="resultMap" parameterType="java.lang.Long">
+    	SELECT * FROM users_cfgs_child where users_cfgs_parent_users_idusers = #{users_idusers} ORDER BY users_cfgs_parent_save_date DESC, progressive ASC
+    </select>
+    
+</mapper>

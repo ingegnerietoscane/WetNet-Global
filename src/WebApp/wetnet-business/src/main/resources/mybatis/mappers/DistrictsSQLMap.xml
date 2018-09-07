@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="districts">
+    
+    <resultMap id="districtsResultMap" type="net.wedjaa.wetnet.business.domain.Districts">
+        <result property="idDistricts" column="ID_DISTRICTS" />
+        <result property="name" column="NAME" />
+        <result property="zone" column="zone" />
+        <result property="dClass" column="CLASS" />
+        <result property="municipality" column="MUNICIPALITY" />
+        <result property="inhabitants" column="INHABITANTS" />
+        
+        <!-- ***RC 03/11/2015*** -->
+		<result property="waterAuthority" column="water_authority" />
+		<result property="mapLevel" column="map_level" />
+		<result property="aeegCode" column="aeeg_code" />
+		<result property="gisCode" column="gis_code" />
+		<result property="withdrawalOperationalArea" column="withdrawal_operational_area" />
+		<result property="withdrawalArea" column="withdrawal_area" />
+		<result property="type" column="type" />
+        <!-- ***END*** -->
+    </resultMap>
+    
+    <resultMap id="measuresHasDistrictsResultMap" type="net.wedjaa.wetnet.business.domain.MeasuresHasDistricts">
+        <result property="measures_id_measures" column="measures_id_measures" />
+        <result property="districts_id_districts" column="districts_id_districts" />
+        <result property="districts_name" column="districts_name" />
+        <result property="measures_name" column="measures_name" />
+        <result property="sign" column="sign" />
+        
+        <!-- /* GC - 22/10/2015
+        <result property="measures_connections_id_odbcdsn" column="measures_connections_id_odbcdsn" />
+        -->
+    </resultMap>
+	
+    <select id="getAllDistricts" resultMap="districtsResultMap">
+        SELECT d.* FROM districts as d
+        <if test="idusers != null">
+    		inner join users_has_districts as ud on (ud.districts_id_districts = d.id_districts) where ud.users_idusers = #{idusers}
+  		</if>
+  		ORDER BY name;  
+    </select>
+    
+    <select id="getById" resultMap="districtsResultMap" parameterType="java.lang.Long">
+    	SELECT * FROM districts where id_districts = #{value}
+    </select>
+    
+    <update id="updateDistricts" parameterType="net.wedjaa.wetnet.business.domain.Districts">
+	  	update districts set
+    	name = #{name},
+    	zone = #{zone},
+    	class = #{dClass}, 
+    	municipality = #{municipality},
+	    inhabitants = #{inhabitants},
+    	update_timestamp = #{update_timestamp},
+    	min_night_start_time = #{min_night_start_time},
+    	min_night_stop_time = #{min_night_stop_time},
+    	<!-- /* GC - 22/10/2015 */ 
+    	max_day_start_time_1 = #{max_day_start_time_1},
+    	max_day_stop_time_1 = #{max_day_stop_time_1},
+    	max_day_start_time_2 = #{max_day_start_time_2},
+    	max_day_stop_time_2 = #{max_day_stop_time_2},
+    	max_day_start_time_3 = #{max_day_start_time_3},
+    	max_day_stop_time_3 = #{max_day_stop_time_3},
+    	-->
+    	unitary_phisiological_nigth_demand = #{unitary_phisiological_nigth_demand},
+    	properties = #{properties},
+    	rewarded_water = #{rewarded_water},
+    	billing = #{billing},
+    	not_household_night_use = #{not_household_night_use},
+    	length_main = #{length_main},
+    	average_zone_night_pressure = #{average_zone_night_pressure},
+    	household_night_use = #{household_night_use},
+    	alpha_emitter_exponent = #{alpha_emitter_exponent},
+    	sap_code = #{sap_code},
+        ev_bands_autoupdate = #{ev_bands_autoupdate},
+        ev_enable = #{ev_enable},
+    	ev_high_band = #{ev_high_band},
+    	ev_low_band = #{ev_low_band},
+    	ev_statistic_high_band = #{ev_statistic_high_band},
+    	ev_statistic_low_band = #{ev_statistic_low_band},
+    	ev_variable_type = #{ev_variable_type},
+    	ev_last_good_sample_day = #{ev_last_good_sample_day},
+    	ev_last_good_samples = #{ev_last_good_samples},
+    	ev_alpha = #{ev_alpha},
+    	ev_samples_trigger = #{ev_samples_trigger},
+    	notes = #{notes},
+        map = #{map},
+        <!-- ***RC 03/11/2015*** -->
+        water_authority = #{waterAuthority},
+		map_level = #{mapLevel},
+		aeeg_code = #{aeegCode},
+		gis_code = #{gisCode},
+		withdrawal_operational_area = #{withdrawalOperationalArea},
+		withdrawal_area = #{withdrawalArea},
+		type = #{type}
+        <!-- ***END*** -->
+    	where id_districts = #{idDistricts}
+	</update>
+	
+	<insert id="insertDistricts" parameterType="net.wedjaa.wetnet.business.domain.Districts" keyProperty="idDistricts" useGeneratedKeys="true">
+		insert into districts (name, class, zone,
+    	municipality,
+	    inhabitants,
+    	update_timestamp,
+		min_night_start_time,
+    	min_night_stop_time,
+    	<!-- /* GC - 22/10/2015 */ 
+    	max_day_start_time_1,
+    	max_day_stop_time_1,
+    	max_day_start_time_2,
+    	max_day_stop_time_2,
+    	max_day_start_time_3,
+    	max_day_stop_time_3,
+    	-->
+	    unitary_phisiological_nigth_demand,
+    	properties,
+    	rewarded_water,
+    	billing,
+    	not_household_night_use,
+    	length_main,
+    	average_zone_night_pressure,
+    	household_night_use,
+    	alpha_emitter_exponent,
+    	sap_code,
+        ev_bands_autoupdate,
+        ev_enable,
+    	ev_high_band,
+    	ev_low_band,
+    	ev_statistic_high_band,
+    	ev_statistic_low_band,
+    	ev_variable_type,
+    	ev_last_good_sample_day,
+    	ev_last_good_samples,
+    	ev_alpha,
+    	ev_samples_trigger,
+    	notes,
+        map,
+        <!-- ***RC 03/11/2015*** -->
+        water_authority,
+        map_level,
+        aeeg_code,
+        gis_code,
+        withdrawal_operational_area,
+        withdrawal_area,
+        type
+        <!-- ***END*** -->
+        )
+    	values (#{name}, #{dClass}, #{zone},
+		#{municipality},
+	    #{inhabitants},
+    	#{update_timestamp},
+    	#{min_night_start_time},
+    	#{min_night_stop_time},
+    	<!-- /* GC - 22/10/2015 */ 
+    	#{max_day_start_time_1},
+    	#{max_day_stop_time_1},
+    	#{max_day_start_time_2},
+    	#{max_day_stop_time_2},
+    	#{max_day_start_time_3},
+    	#{max_day_stop_time_3},
+    	-->
+		#{unitary_phisiological_nigth_demand},
+    	#{properties},
+    	#{rewarded_water},
+    	#{billing},
+    	#{not_household_night_use},
+    	#{length_main},
+    	#{average_zone_night_pressure},
+    	#{household_night_use},
+    	#{alpha_emitter_exponent},
+    	#{sap_code},
+        #{ev_bands_autoupdate},
+        #{ev_enable},
+    	#{ev_high_band},
+    	#{ev_low_band},
+    	#{ev_statistic_high_band},
+    	#{ev_statistic_low_band},
+    	#{ev_variable_type},
+    	#{ev_last_good_sample_day},
+    	#{ev_last_good_samples},
+    	#{ev_alpha},
+    	#{ev_samples_trigger},
+    	#{notes},
+        #{map},
+        <!-- ***RC 03/11/2015*** -->
+        #{waterAuthority},
+		#{mapLevel},
+		#{aeegCode},
+		#{gisCode},
+		#{withdrawalOperationalArea},
+		#{withdrawalArea},
+		#{type}
+        <!-- ***END*** -->
+        )
+	</insert>
+	
+	<delete id="deleteDistricts" parameterType="java.lang.Long">
+  		delete from districts where id_districts = #{value} 
+	</delete>
+
+    <select id="getAllZones" resultMap="districtsResultMap">
+        SELECT zone FROM districts AS d
+        <if test="idusers != null">
+            INNER JOIN users_has_districts AS ud ON (ud.districts_id_districts = d.id_districts) WHERE ud.users_idusers = #{idusers}
+        </if>
+        GROUP BY zone ORDER BY zone;
+    </select>
+    
+    <select id="getAllMunicipalities" resultMap="districtsResultMap">
+        SELECT municipality FROM districts AS d
+        <if test="idusers != null">
+            INNER JOIN users_has_districts AS ud ON (ud.districts_id_districts = d.id_districts) WHERE ud.users_idusers = #{idusers}
+        </if>
+        GROUP BY municipality ORDER BY municipality;
+    </select>
+
+ <!-- ***RC 04/11/2015*** -->
+    <select id="getAllWaterAuthorities" resultMap="districtsResultMap">
+        SELECT water_authority FROM districts AS d
+        <if test="idusers != null">
+            INNER JOIN users_has_districts AS ud ON (ud.districts_id_districts = d.id_districts) WHERE ud.users_idusers = #{idusers} AND water_authority IS NOT NULL
+        </if>
+        <if test="idusers == null">
+            WHERE water_authority IS NOT NULL
+        </if>
+        GROUP BY water_authority ORDER BY water_authority;
+    </select>
+	<!-- ***END*** -->
+	
+
+	<!-- /* GC - 22/10/2015
+   	<insert id="insertMeasuresHasDistricts" parameterType="net.wedjaa.wetnet.business.domain.MeasuresHasDistricts" >
+		insert into measures_has_districts (districts_id_districts,measures_id_measures, measures_connections_id_odbcdsn, sign)
+		values (#{districts_id_districts},#{measures_id_measures},#{measures_connections_id_odbcdsn},#{sign})
+	</insert>
+	-->
+	<insert id="insertMeasuresHasDistricts" parameterType="net.wedjaa.wetnet.business.domain.MeasuresHasDistricts" >
+		insert into measures_has_districts (districts_id_districts,measures_id_measures, sign)
+		values (#{districts_id_districts},#{measures_id_measures},#{sign})
+	</insert>
+	
+	<delete id="deleteMeasuresHasDistricts" parameterType="net.wedjaa.wetnet.business.domain.MeasuresHasDistricts">
+  		delete from measures_has_districts where measures_id_measures = #{measures_id_measures} and districts_id_districts = #{districts_id_districts} 
+	</delete>
+    
+    <select id="measuresHasDistrictsBydIdDistricts" resultMap="measuresHasDistrictsResultMap" parameterType="java.lang.Long">
+    	SELECT measures_has_districts.*, districts.name as districts_name, measures.name as measures_name FROM measures_has_districts inner join districts on (districts_id_districts = id_districts) inner join measures on (measures_id_measures = id_measures) where measures_has_districts.districts_id_districts = #{value}
+    </select>
+    
+</mapper>
+

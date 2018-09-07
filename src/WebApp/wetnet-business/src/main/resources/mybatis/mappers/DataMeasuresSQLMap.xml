@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dataMeasures">
+        
+     <resultMap id="dataMeasuresResultMap" type="net.wedjaa.wetnet.business.domain.DataMeasures">
+     	<result property="nameMeasures" column="name" />
+        <result property="measuresIdMeasures" column="MEASURES_ID_MEASURES" />
+        <result property="timestamp" column="TIMESTAMP" />
+        <result property="value" column="VALUE" />
+    </resultMap>
+    
+   
+    <!-- granularita timestamp -->
+    <select id="getAllDataMeasuresFiltered" parameterType="net.wedjaa.wetnet.business.dao.params.DataMeasuresFilter" resultMap="dataMeasuresResultMap">
+        SELECT m.name, d.measures_id_measures, d.timestamp, d.value from data_measures as d
+        inner join measures as m on d.measures_id_measures = m.id_measures   
+		where 
+		timestamp &gt;= #{startdate} and timestamp &lt;= #{enddate}
+		and measures_id_measures = #{measuresIdMeasures}
+		order by timestamp
+    </select>
+    
+     <!-- granularita ore -->
+    <select id="getDataMeasuresAVGOnHoursFiltered" parameterType="net.wedjaa.wetnet.business.dao.params.DataMeasuresFilter" resultMap="dataMeasuresResultMap">
+        SELECT m.name, d.measures_id_measures, DATE_FORMAT(d.timestamp, '%Y-%m-%d %H:00:00') as timestamp, avg(d.value) as value from data_measures as d
+        inner join measures as m on d.measures_id_measures = m.id_measures  
+		where 
+		DATE_FORMAT(d.timestamp, '%Y-%m-%d %H:00:00') &gt;= #{startdate} and DATE_FORMAT(d.timestamp, '%Y-%m-%d %H:00:00') &lt;= #{enddate}
+		and d.measures_id_measures = #{measuresIdMeasures}
+		group by m.name, d.measures_id_measures, DATE_FORMAT(d.timestamp, '%Y-%m-%d %H:00:00') order by timestamp
+    </select>
+    
+     
+    <!-- granularita giorno -->
+    <select id="getDataMeasuresAVGOnDaysFiltered" parameterType="net.wedjaa.wetnet.business.dao.params.DataMeasuresFilter" resultMap="dataMeasuresResultMap">
+        SELECT m.name, d.measures_id_measures, date(d.timestamp) as timestamp, avg(d.value) as value from data_measures as d
+        inner join measures as m on d.measures_id_measures = m.id_measures  
+		where 
+		date(d.timestamp) &gt;= #{startdate} and date(d.timestamp) &lt;= #{enddate}
+		and d.measures_id_measures = #{measuresIdMeasures}
+		group by m.name, d.measures_id_measures, date(d.timestamp) order by timestamp
+    </select>
+    
+    <!-- GC 18/11/2015 granularita mese DATE_FORMAT(d.timestamp, '%Y-%m')-->
+    <select id="getDataMeasuresAVGOnMonthsFiltered" parameterType="net.wedjaa.wetnet.business.dao.params.DataMeasuresFilter" resultMap="dataMeasuresResultMap">
+        SELECT m.name, d.measures_id_measures, DATE_FORMAT(d.timestamp, '%Y-%m-01') as timestamp, avg(d.value) as value from data_measures as d
+        inner join measures as m on d.measures_id_measures = m.id_measures  
+		where 
+		date(d.timestamp) &gt;= #{startdate} and date(d.timestamp) &lt;= #{enddate}
+		and d.measures_id_measures = #{measuresIdMeasures}
+		group by m.name, d.measures_id_measures, DATE_FORMAT(d.timestamp, '%Y-%m') order by timestamp
+    </select>
+    
+     <!-- GC 18/11/2015 granularita anno DATE_FORMAT(d.timestamp, '%Y')-->
+    <select id="getDataMeasuresAVGOnYearsFiltered" parameterType="net.wedjaa.wetnet.business.dao.params.DataMeasuresFilter" resultMap="dataMeasuresResultMap">
+        SELECT m.name, d.measures_id_measures, DATE_FORMAT(d.timestamp, '%Y-01-01') as timestamp, avg(d.value) as value from data_measures as d
+        inner join measures as m on d.measures_id_measures = m.id_measures  
+		where 
+		date(d.timestamp) &gt;= #{startdate} and date(d.timestamp) &lt;= #{enddate}
+		and d.measures_id_measures = #{measuresIdMeasures}
+		group by m.name, d.measures_id_measures, DATE_FORMAT(d.timestamp, '%Y') order by timestamp
+    </select>
+    
+     <!-- GC 03/11/2015 -->
+    <select id="getDataMeasuresAVGFiltered" parameterType="net.wedjaa.wetnet.business.dao.params.DataMeasuresFilter" resultMap="dataMeasuresResultMap">
+        SELECT m.name, d.measures_id_measures, avg(d.value) as value from data_measures as d
+        inner join measures as m on d.measures_id_measures = m.id_measures  
+		where 
+		date(d.timestamp) &gt;= #{startdate} and date(d.timestamp) &lt;= #{enddate}
+		and d.measures_id_measures = #{measuresIdMeasures}
+		group by m.name, d.measures_id_measures order by m.name
+    </select>
+    
+    
+    
+    
+    
+    
+</mapper>
+
+    

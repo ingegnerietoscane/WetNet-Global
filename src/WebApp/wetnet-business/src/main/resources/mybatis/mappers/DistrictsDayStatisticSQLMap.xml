@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="districtsDayStatistic">
+   
+    <resultMap id="districtsDayStatisticResultMap" type="net.wedjaa.wetnet.business.domain.DistrictsDayStatistic">
+        <result property="idDistricts" column="DISTRICTS_ID_DISTRICTS" />
+        <result property="day" column="DAY" />
+        <result property="date" column="DAY" />
+        <result property="dayType" column="DAY_TYPE" />
+        <result property="minNight" column="MIN_NIGHT" />
+        <result property="minDay" column="MIN_DAY" />
+        <result property="maxDay" column="MAX_DAY" />
+        <result property="avgDay" column="AVG_DAY" />
+        <result property="standardDeviation" column="STANDARD_DEVIATION" />
+        <result property="realLeakage" column="REAL_LEAKAGE" />
+        <result property="volumeRealLosses" column="VOLUME_REAL_LOSSES" />
+        <result property="range" column="RANGE" />
+        <result property="mnfPressure" column="MNF_PRESSURE" />
+        <result property="minNightPressure" column="MIN_NIGHT_PRESSURE" />
+    </resultMap>
+    
+    <resultMap id="dayStatisticJoinDistrictsJoinEnergyResultMap" type="net.wedjaa.wetnet.business.domain.DayStatisticJoinDistrictsJoinEnergy">
+        <result property="day" column="DAY" />
+        <result property="minNight" column="MIN_NIGHT" />
+        <result property="avgDay" column="AVG_DAY" />
+        <result property="volumeRealLosses" column="VOLUME_REAL_LOSSES" />
+        <result property="maxDay" column="MAX_DAY" />
+        <result property="minDay" column="MIN_DAY" />
+        <result property="range" column="RANGE" />
+        <result property="standardDeviation" column="STANDARD_DEVIATION" />
+        <result property="realLeakage" column="REAL_LEAKAGE" />
+        <result property="ied" column="IED" />
+        <result property="epd" column="EPD" />
+        <result property="iela" column="IELA" />
+        <result property="evLowBand" column="EV_LOW_BAND" />
+        <result property="evHighBand" column="EV_HIGH_BAND" />
+        <result property="householdNightUse" column="HOUSEHOLD_NIGHT_USE" />
+        <result property="notHouseholdNightUse" column="NOT_HOUSEHOLD_NIGHT_USE" />
+        
+        <!-- GC 04/11/2015 per contenere la colonna altrimenti errore con il nome -->
+        <result property="rangeAvg" column="RANGE_AVG" />
+        
+        <!-- GC 16/11/2015 -->
+         <result property="idDistricts" column="id_districts" />
+         <result property="nameDistricts" column="districts_name" />
+    </resultMap>
+	
+	
+	
+	 <select id="getAllDistrictsDayStatistic" resultMap="districtsDayStatisticResultMap">
+        SELECT * FROM districts_day_statistic;
+    </select>
+    
+    <select id="getDistrictsDayStatisticById" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter"  resultMap="districtsDayStatisticResultMap">
+        SELECT * FROM districts_day_statistic WHERE day &gt;= #{startdate} and day &lt;= #{enddate} and districts_id_districts = #{idDistrict};
+    </select>
+    
+    <select id="getDistrictsDayStatisticByDistrict" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter"  resultMap="districtsDayStatisticResultMap">
+        SELECT s.day, s.real_leakage, s.volume_real_losses FROM districts_day_statistic AS s
+        INNER JOIN districts AS d ON (s.districts_id_districts = d.id_districts)
+        WHERE s.day &gt;= #{startdate} AND s.day &lt;= #{enddate} AND d.id_districts = #{idDistrict};
+    </select>
+    
+    <select id="getDistrictsDayStatisticByMunicipality" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter"  resultMap="districtsDayStatisticResultMap">
+        SELECT s.day, SUM(s.real_leakage) AS real_leakage, SUM(s.volume_real_losses) AS volume_real_losses FROM districts_day_statistic AS s
+        INNER JOIN districts AS d ON (s.districts_id_districts = d.id_districts)
+        WHERE s.day &gt;= #{startdate} AND s.day &lt;= #{enddate} AND d.municipality = #{municipality} GROUP BY s.day ORDER BY s.day;
+    </select>
+    
+    <select id="getDistrictsDayStatisticByZone" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter"  resultMap="districtsDayStatisticResultMap">
+        SELECT s.day, SUM(s.real_leakage) AS real_leakage, SUM(s.volume_real_losses) AS volume_real_losses FROM districts_day_statistic AS s
+        INNER JOIN districts AS d ON (s.districts_id_districts = d.id_districts)
+        WHERE s.day &gt;= #{startdate} AND s.day &lt;= #{enddate} AND d.zone = #{zone} GROUP BY s.day ORDER BY s.day;
+    </select>
+       
+        
+    <!-- granularita giorno -->
+    <select id="getDayStatisticJoinDistrictsJoinEnergy" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="dayStatisticJoinDistrictsJoinEnergyResultMap">
+        SELECT s.day, s.min_night, s.avg_day, s.max_day, s.min_day, s.range, s.standard_deviation, s.real_leakage, s.volume_real_losses, e.ied, e.epd, e.iela, 
+        d.ev_low_band, d.ev_high_band, d.household_night_use, d.not_household_night_use,d.id_districts,d.name AS districts_name
+        FROM districts_day_statistic AS s
+        INNER JOIN districts AS d ON (s.districts_id_districts = d.id_districts)
+        INNER JOIN districts_energy_day_statistic AS e ON (s.districts_id_districts = e.districts_id_districts AND e.day = s.day)
+        WHERE s.day &gt;= #{startdate} AND s.day &lt;= #{enddate} AND s.districts_id_districts = #{idDistrict};
+    </select>
+    
+     <!-- GC 18/11/2014 granularita mese DATE_FORMAT(s.day, '%Y-%m')-->
+    <select id="getDayStatisticJoinDistrictsJoinEnergyonMonths" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="dayStatisticJoinDistrictsJoinEnergyResultMap">
+      <!-- old -->
+      <!--  SELECT DATE_FORMAT(s.day, '%Y-%m-01') as day ,avg(s.min_night) as min_night, avg(s.avg_day) as avg_day, avg(s.max_day) as max_day, avg(s.min_day) as min_day, 
+        avg(s.range) as RANGE_AVG, avg(s.standard_deviation) as standard_deviation, avg(s.real_leakage) as real_leakage, 
+        avg(s.volume_real_losses) as volume_real_losses, avg(e.ied) as ied, avg(e.epd) as epd, avg(e.iela) as iela, 
+        avg(d.ev_low_band) as ev_low_band, avg(d.ev_high_band) as ev_high_band, avg(d.household_night_use) as household_night_use, 
+        avg(d.not_household_night_use) as not_household_night_use,d.id_districts,d.name AS districts_name
+        FROM districts_day_statistic AS s
+        INNER JOIN districts AS d ON (s.districts_id_districts = d.id_districts)
+        INNER JOIN districts_energy_day_statistic AS e ON (s.districts_id_districts = e.districts_id_districts AND e.day = s.day)
+        WHERE date(s.day) &gt;= #{startdate} AND date(s.day) &lt;= #{enddate} AND s.districts_id_districts = #{idDistrict}
+		group by districts_name, DATE_FORMAT(s.day, '%Y-%m') order by districts_name, s.day;-->
+		<!-- version 1.0.10 -->
+		 <!--  SELECT DATE_FORMAT(s.day, '%Y-%m-01') as day , m.min_night as min_night, m.avg_month as avg_day, m.max_month as max_day, m.min_month as min_day, 
+        avg(s.range) as RANGE_AVG, avg(s.standard_deviation) as standard_deviation, avg(s.real_leakage) as real_leakage, 
+        avg(s.volume_real_losses) as volume_real_losses, avg(e.ied) as ied, avg(e.epd) as epd, avg(e.iela) as iela, 
+        avg(d.ev_low_band) as ev_low_band, avg(d.ev_high_band) as ev_high_band, avg(d.household_night_use) as household_night_use, 
+        avg(d.not_household_night_use) as not_household_night_use,d.id_districts,d.name AS districts_name
+        FROM districts_day_statistic AS s
+        INNER JOIN districts AS d ON (s.districts_id_districts = d.id_districts)
+        INNER JOIN districts_energy_day_statistic AS e ON (s.districts_id_districts = e.districts_id_districts AND e.day = s.day)
+        INNER JOIN districts_month_statistic AS m ON (s.districts_id_districts = m.districts_id_districts AND s.day = DATE_FORMAT(m.month, '%Y-%m-01'))
+        WHERE date(s.day) &gt;= #{startdate} AND date(s.day) &lt;= #{enddate} AND s.districts_id_districts = #{idDistrict}
+		group by districts_name, DATE_FORMAT(s.day, '%Y-%m') order by districts_name, s.day;-->
+		
+		<!-- 16/02/2016 1.0.11-->
+		SELECT DATE_FORMAT(s.day, '%Y-%m-01') as day , m.min_night as min_night, m.avg_month as avg_day, m.max_month as max_day, m.min_month as min_day, 
+        avg(s.range) as RANGE_AVG, avg(s.standard_deviation) as standard_deviation, avg(s.real_leakage) as real_leakage, 
+        avg(s.volume_real_losses) as volume_real_losses, avg(e.ied) as ied, avg(e.epd) as epd, avg(e.iela) as iela, 
+        avg(d.ev_low_band) as ev_low_band, avg(d.ev_high_band) as ev_high_band, avg(d.household_night_use) as household_night_use, 
+        avg(d.not_household_night_use) as not_household_night_use,d.id_districts,d.name AS districts_name
+        FROM districts_day_statistic AS s
+        INNER JOIN districts AS d ON (s.districts_id_districts = d.id_districts)
+        INNER JOIN districts_energy_day_statistic AS e ON (s.districts_id_districts = e.districts_id_districts AND DATE_FORMAT(s.day, '%Y-%m') = DATE_FORMAT(e.day, '%Y-%m'))
+        INNER JOIN districts_month_statistic AS m ON (s.districts_id_districts = m.districts_id_districts AND DATE_FORMAT(s.day, '%Y-%m') = DATE_FORMAT(m.month, '%Y-%m'))
+        WHERE date(s.day) &gt;= #{startdate} AND date(s.day) &lt;= #{enddate} AND s.districts_id_districts = #{idDistrict}
+		group by districts_name, DATE_FORMAT(s.day, '%Y-%m') order by districts_name, s.day;
+	 </select>
+    
+     <!-- GC 18/11/2014  granularita anno DATE_FORMAT(s.day, '%Y') non usata-->
+    <select id="getDayStatisticJoinDistrictsJoinEnergyonYears" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="dayStatisticJoinDistrictsJoinEnergyResultMap">
+       SELECT DATE_FORMAT(s.day, '%Y-01-01') as day , m.min_night as min_night, m.avg_year as avg_day, m.max_year as max_day, m.min_year as min_day, 
+        avg(s.range) as RANGE_AVG, avg(s.standard_deviation) as standard_deviation, avg(s.real_leakage) as real_leakage, 
+        avg(s.volume_real_losses) as volume_real_losses, avg(e.ied) as ied, avg(e.epd) as epd, avg(e.iela) as iela, 
+        avg(d.ev_low_band) as ev_low_band, avg(d.ev_high_band) as ev_high_band, avg(d.household_night_use) as household_night_use, 
+        avg(d.not_household_night_use) as not_household_night_use,d.id_districts,d.name AS districts_name
+        FROM districts_day_statistic AS s
+        INNER JOIN districts AS d ON (s.districts_id_districts = d.id_districts)
+        INNER JOIN districts_energy_day_statistic AS e ON (s.districts_id_districts = e.districts_id_districts AND e.day = s.day)
+        INNER JOIN districts_year_statistic AS m ON (s.districts_id_districts = m.districts_id_districts AND s.day = DATE_FORMAT(s.day, '%Y-01-01'))
+        WHERE date(s.day) &gt;= #{startdate} AND date(s.day) &lt;= #{enddate} AND s.districts_id_districts = #{idDistrict}
+		group by districts_name, DATE_FORMAT(s.day, '%Y') order by districts_name, s.day;
+    </select>
+    
+    
+      <!-- GC 04/11/2015 MEDIA -->
+    <select id="getDayStatisticJoinDistrictsJoinEnergyAvg" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="dayStatisticJoinDistrictsJoinEnergyResultMap">
+        SELECT avg(s.min_night) as min_night, avg(s.avg_day) as avg_day, avg(s.max_day) as max_day, avg(s.min_day) as min_day, 
+        avg(s.range) as RANGE_AVG, avg(s.standard_deviation) as standard_deviation, avg(s.real_leakage) as real_leakage, 
+        avg(s.volume_real_losses) as volume_real_losses, avg(e.ied) as ied, avg(e.epd) as epd, avg(e.iela) as iela, 
+        avg(d.ev_low_band) as ev_low_band, avg(d.ev_high_band) as ev_high_band, avg(d.household_night_use) as household_night_use, 
+        avg(d.not_household_night_use) as not_household_night_use,d.id_districts,d.name AS districts_name
+		FROM districts_day_statistic AS s
+		INNER JOIN districts AS d ON (s.districts_id_districts = d.id_districts)
+		INNER JOIN districts_energy_day_statistic AS e ON (s.districts_id_districts = e.districts_id_districts AND e.day = s.day)
+		WHERE s.day &gt;= #{startdate} AND s.day &lt;= #{enddate} AND s.districts_id_districts = #{idDistrict};
+    </select>
+   
+   <!-- GC 03/11/2015 -->
+    <select id="getDistrictsDayStatisticAvgById" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter"  resultMap="districtsDayStatisticResultMap">
+        SELECT districts_id_districts, avg(min_night) as min_night, avg(min_night_pressure) as min_night_pressure 
+        FROM districts_day_statistic 
+        WHERE day &gt;= #{startdate} and day &lt;= #{enddate} 
+        and districts_id_districts = #{idDistrict}
+        group by districts_id_districts;
+    </select>
+    
+    
+  
+    
+    
+     
+    
+    
+    
+</mapper>

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+    	http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+    	http://www.springframework.org/schema/context
+    	http://www.springframework.org/schema/context/spring-context-4.1.xsd
+    	http://www.springframework.org/schema/aop
+		http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+    	">
+
+	<context:annotation-config />
+
+	<!-- <aop:aspectj-autoproxy proxy-target-class="true" />-->
+
+    <bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+        <property name="fallbackToSystemLocale" value="false"></property>
+        <property name="cacheSeconds" value="1"></property>
+        <property name="useCodeAsDefaultMessage" value="true"></property>
+        <property name="basenames">
+            <list>
+                <value>classpath:wetnet</value>
+            </list>
+        </property>
+    </bean>
+    
+	<!-- ***RC 04/12/2015*** BEAN PER ACCESSO ALLE PROPERTIES LATO BUSINESS/WEB -->
+	<bean id="propertiesSource" class="net.wedjaa.wetnet.business.commons.PropertiesUtil">
+    	<property name="ignoreUnresolvablePlaceholders" value="true" />
+		<property name="ignoreResourceNotFound" value="true" />
+		<property name="locations">
+			<list>
+				<value>classpath:business.properties</value>
+                <value>classpath*:wetnet-configuration.properties</value>
+			</list>
+		</property>
+	</bean>
+	<!-- ***END*** -->
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
+		<property name="ignoreResourceNotFound" value="true" />
+		<property name="locations">
+			<list>
+				<value>classpath:business.properties</value>
+                <value>classpath*:wetnet-configuration.properties</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${database.driver}" />
+		<property name="url" value="${database.url}" />
+		<property name="username" value="${database.username}" />
+		<property name="password" value="${database.password}" />
+		<property name="testOnBorrow" value="true" />
+		<property name="validationQuery" value="SELECT 1" />
+	</bean>
+
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="typeAliasesPackage" value="net.wedjaa.wetnet.business.domain" />
+		<property name="mapperLocations" value="classpath*:mybatis/mappers/*.xml" />
+	</bean>
+
+	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg index="0" ref="sqlSessionFactory" />
+		<constructor-arg index="1" value="BATCH" />
+	</bean>
+
+	<!--
+	TODO Alessandro: Da verificare se abilitare
+	
+	 <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="net.wedjaa.wetnet.business.dao" />
+		<property name="sqlSessionTemplate" ref="sqlSession" />
+	</bean> -->
+
+ 	<bean id="measuresDAO" class="net.wedjaa.wetnet.business.dao.MeasuresDAOImpl"/>
+ 	
+ 	<bean id="dataMeasuresDAO" class="net.wedjaa.wetnet.business.dao.DataMeasuresDAOImpl"/>
+ 	
+ 	<bean id="districtsDAO" class="net.wedjaa.wetnet.business.dao.DistrictsDAOImpl"/>
+
+ 	<bean id="districtsDayStatisticDAO" class="net.wedjaa.wetnet.business.dao.DistrictsDayStatisticDAOImpl"/>
+
+	<bean id="dataDistrictsDAO" class="net.wedjaa.wetnet.business.dao.DataDistrictsDAOImpl"/>
+	
+	<bean id="dataDistrictsService" class="net.wedjaa.wetnet.business.services.DataDistrictsServiceImpl"/>
+	
+	<bean id="eventsDAO" class="net.wedjaa.wetnet.business.dao.EventsDAOImpl"/>
+	
+	<bean id="usersDAO" class="net.wedjaa.wetnet.business.dao.UsersDAOImpl"/>
+	
+	<bean id="connectionsDAO" class="net.wedjaa.wetnet.business.dao.ConnectionsDAOImpl"/>
+	
+	<bean id="graphicService" class="net.wedjaa.wetnet.business.services.GraphicServiceImpl"/>
+    
+    <bean id="eventsService" class="net.wedjaa.wetnet.business.services.EventsServiceImpl"/>
+
+    <bean id="epanetService" class="net.wedjaa.wetnet.business.services.EpanetServiceImpl"/>
+
+    <bean id="districtsEnergyDayStatisticDAO" class="net.wedjaa.wetnet.business.dao.DistrictsEnergyDayStatisticDAOImpl"/>
+
+	<bean id="authorizationProxyFactoryBean" class="net.wedjaa.wetnet.aop.AuthorizationProxy"></bean>
+
+    <bean id="measuresDayStatisticDAO" class="net.wedjaa.wetnet.business.dao.MeasuresDayStatisticDAOImpl"/>
+    
+    <bean id="mapViewDAO" class="net.wedjaa.wetnet.business.dao.MapViewDAOImpl"/>
+    
+    <bean id="mapViewService" class="net.wedjaa.wetnet.business.services.MapViewServiceImpl"/>
+	
+    <bean id="districtsBandsHistoryDAO" class="net.wedjaa.wetnet.business.dao.DistrictsBandsHistoryDAOImpl"/>
+    
+    <bean id="infoService" class="net.wedjaa.wetnet.business.services.InfoServiceImpl">
+        <property name="wetnetVersion" value="${wetnet-version}" />
+    </bean>
+    <!-- ***RC 02/12/2015*** -->
+    <bean id="districtsFilesDAO" class="net.wedjaa.wetnet.business.dao.DistrictsFilesDAOImpl"/>
+     <bean id="measuresFilesDAO" class="net.wedjaa.wetnet.business.dao.MeasuresFilesDAOImpl"/>
+    
+    <bean id="cfgsParentDAO" class="net.wedjaa.wetnet.business.dao.UsersCFGSParentDAOImpl"/>
+    <bean id="cfgsChildDAO" class="net.wedjaa.wetnet.business.dao.UsersCFGSChildDAOImpl"/>
+   	<!-- ***END*** -->
+    <bean id="alarmsDAO" class="net.wedjaa.wetnet.business.dao.AlarmsDAOImpl"/>
+     <bean id="alarmsService" class="net.wedjaa.wetnet.business.services.AlarmsServiceImpl"/>
+    
+</beans>

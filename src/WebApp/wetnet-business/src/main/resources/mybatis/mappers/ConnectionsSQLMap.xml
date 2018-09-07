@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="connections">
+
+    <resultMap id="resultMap" type="net.wedjaa.wetnet.business.domain.Connections">
+        <result property="id_odbcdsn" column="id_odbcdsn" />
+        <result property="odbc_dsn" column="odbc_dsn" />
+        <result property="description" column="description" />
+        
+        <!-- GC 22/10/2015 -->
+        <result property="username" column="username" />
+        <result property="password" column="password" />
+        <result property="dbType" column="db_type" />
+    </resultMap>
+    
+    
+    <select id="getAll" resultMap="resultMap">
+    	SELECT * FROM connections
+    </select>
+    
+    <select id="getBydId" resultMap="resultMap" parameterType="java.lang.Long">
+    	SELECT * FROM connections where id_odbcdsn = #{value}
+    </select>
+    
+    <update id="update" parameterType="net.wedjaa.wetnet.business.domain.Connections">
+	  	update connections set
+	    odbc_dsn = #{odbc_dsn},
+	    description = #{description},
+	     <!-- GC 22/10/2015 -->
+	     username = #{username},
+	     password = #{password},
+	     db_type = #{dbType}
+	  	where id_odbcdsn = #{id_odbcdsn}
+	</update>
+	
+	 <!-- GC 22/10/2015 -->
+	<insert id="insert" parameterType="net.wedjaa.wetnet.business.domain.Connections" useGeneratedKeys="true" keyProperty="id_odbcdsn">
+		insert into connections (odbc_dsn,description,username,password,db_type)
+		values (#{odbc_dsn},#{description},#{username},#{password},#{dbType})
+	</insert>
+	
+	<delete id="delete" parameterType="java.lang.Long">
+  		delete from connections where id_odbcdsn = #{value}
+	</delete>
+	
+</mapper>

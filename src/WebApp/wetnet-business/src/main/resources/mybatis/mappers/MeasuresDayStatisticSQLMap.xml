@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="measuresDayStatistic">
+        
+     <resultMap id="measuresDayStatisticMap" type="net.wedjaa.wetnet.business.domain.MeasuresDayStatistic">
+     	<result property="day" column="day" />
+        <result property="day_type" column="day_type" />
+        <result property="min_night" column="min_night" />
+        <result property="max_day" column="max_day" />
+        <result property="avg_day" column="avg_day" />
+        <result property="standard_deviation" column="standard_deviation" />
+        <result property="range" column="range" />
+        <result property="measures_id_measures" column="measures_id_measures" />
+        
+        <!-- /* GC - 22/10/2015
+   		<result property="measures_connections_id_odbcdsn" column="measures_connections_id_odbcdsn" />
+    	-->
+    </resultMap>
+        
+    <resultMap id="dayStatisticJoinMeasuresResultMap" type="net.wedjaa.wetnet.business.domain.DayStatisticJoinMeasures">
+        <result property="day" column="DAY" />
+        <result property="minNight" column="MIN_NIGHT" />
+        <result property="avgDay" column="AVG_DAY" />
+        <result property="maxDay" column="MAX_DAY" />
+        <result property="minDay" column="MIN_DAY" />
+        <result property="range" column="RANGE" />
+        <result property="standardDeviation" column="STANDARD_DEVIATION" />
+        <result property="alarmMinThreshold" column="ALARM_MIN_THRESHOLD" />
+        <result property="alarmMaxThreshold" column="ALARM_MAX_THRESHOLD" />
+        
+        <!-- GC 04/11/2015 per contenere la colonna altrimenti errore con il nome -->
+        <result property="rangeAvg" column="RANGE_AVG" />
+        <!-- GC 16/11/2015--> 
+        <result property="idMeasures" column="id_measures" />
+         <result property="nameMeasures" column="nameMeasures" />
+        
+    </resultMap>
+        
+        <!-- granulita giorno -->
+    <select id="getDayStatisticJoinMeasures" parameterType="net.wedjaa.wetnet.business.dao.params.DataMeasuresFilter" resultMap="dayStatisticJoinMeasuresResultMap">
+        SELECT s.day, s.min_night, s.avg_day, s.max_day, s.min_day, s.range, s.standard_deviation, m.alarm_min_threshold, m.alarm_max_threshold, m.id_measures, m.name AS nameMeasures
+        FROM measures_day_statistic AS s
+        INNER JOIN measures AS m ON (s.measures_id_measures = m.id_measures)
+        WHERE s.day &gt;= #{startdate} AND s.day &lt;= #{enddate} AND s.measures_id_measures = #{measuresIdMeasures} ;
+    </select>
+    
+       <!-- GC 18/11/2015 granulita mese  DATE_FORMAT(s.day, '%Y-%m')-->
+    <select id="getDayStatisticJoinMeasuresonMonths" parameterType="net.wedjaa.wetnet.business.dao.params.DataMeasuresFilter" resultMap="dayStatisticJoinMeasuresResultMap">
+       <!--  SELECT DATE_FORMAT(s.day, '%Y-%m-01') as day, avg(s.min_night) as min_night, avg(s.avg_day) as avg_day, avg(s.max_day) as max_day, avg(s.min_day) as min_day, 
+        avg(s.range) as RANGE_AVG, avg(s.standard_deviation) as standard_deviation, avg(m.alarm_min_threshold) as ALARM_MIN_THRESHOLD, 
+        avg(m.alarm_max_threshold) as ALARM_MAX_THRESHOLD,m.id_measures, m.name AS nameMeasures
+        FROM measures_day_statistic AS s
+        INNER JOIN measures AS m ON (s.measures_id_measures = m.id_measures)
+        WHERE date(s.day) &gt;= #{startdate} AND s.day &lt;= #{enddate} 
+        AND s.measures_id_measures = #{measuresIdMeasures} 
+        group by nameMeasures, DATE_FORMAT(s.day, '%Y-%m') order by nameMeasures, s.day;
+        -->
+        
+         SELECT DATE_FORMAT(s.day, '%Y-%m-01') as day, mo.min_night as min_night, mo.avg_month as avg_day, mo.max_month as max_day, mo.min_month as min_day, 
+        avg(s.range) as RANGE_AVG, avg(s.standard_deviation) as standard_deviation, avg(m.alarm_min_threshold) as ALARM_MIN_THRESHOLD, 
+        avg(m.alarm_max_threshold) as ALARM_MAX_THRESHOLD,m.id_measures, m.name AS nameMeasures
+        FROM measures_day_statistic AS s
+        INNER JOIN measures AS m ON (s.measures_id_measures = m.id_measures)
+        INNER JOIN measures_month_statistic AS mo ON (s.measures_id_measures = mo.measures_id_measures AND s.day = DATE_FORMAT(s.day, '%Y-%m-01'))
+        WHERE date(s.day) &gt;= #{startdate} AND s.day &lt;= #{enddate} 
+        AND s.measures_id_measures = #{measuresIdMeasures} 
+        group by nameMeasures, DATE_FORMAT(s.day, '%Y-%m') order by nameMeasures, s.day;
+    </select>
+    
+      <!-- GC 18/11/2015 granulita anno DATE_FORMAT(s.day, '%Y')-->
+    <select id="getDayStatisticJoinMeasuresonYears" parameterType="net.wedjaa.wetnet.business.dao.params.DataMeasuresFilter" resultMap="dayStatisticJoinMeasuresResultMap">
+       <!--   SELECT DATE_FORMAT(s.day, '%Y-01-01') as day, avg(s.min_night) as min_night, avg(s.avg_day) as avg_day, avg(s.max_day) as max_day, avg(s.min_day) as min_day, 
+        avg(s.range) as RANGE_AVG, avg(s.standard_deviation) as standard_deviation, avg(m.alarm_min_threshold) as ALARM_MIN_THRESHOLD, 
+        avg(m.alarm_max_threshold) as ALARM_MAX_THRESHOLD,m.id_measures, m.name AS nameMeasures
+        FROM measures_day_statistic AS s
+        INNER JOIN measures AS m ON (s.measures_id_measures = m.id_measures)
+        WHERE date(s.day) &gt;= #{startdate} AND date(s.day) &lt;= #{enddate} 
+        AND s.measures_id_measures = #{measuresIdMeasures} 
+        group by nameMeasures, DATE_FORMAT(s.day, '%Y') order by nameMeasures, s.day;-->
+         SELECT DATE_FORMAT(s.day, '%Y-01-01') as day, mo.min_night as min_night, mo.avg_year as avg_day, mo.max_year as max_day, mo.min_year as min_day, 
+        avg(s.range) as RANGE_AVG, avg(s.standard_deviation) as standard_deviation, avg(m.alarm_min_threshold) as ALARM_MIN_THRESHOLD, 
+        avg(m.alarm_max_threshold) as ALARM_MAX_THRESHOLD,m.id_measures, m.name AS nameMeasures
+        FROM measures_day_statistic AS s
+        INNER JOIN measures AS m ON (s.measures_id_measures = m.id_measures)
+        INNER JOIN measures_year_statistic AS mo ON (s.measures_id_measures = mo.measures_id_measures AND s.day = DATE_FORMAT(s.day, '%Y-01-01'))
+        WHERE date(s.day) &gt;= #{startdate} AND date(s.day) &lt;= #{enddate} 
+        AND s.measures_id_measures = #{measuresIdMeasures} 
+        group by nameMeasures, DATE_FORMAT(s.day, '%Y') order by nameMeasures, s.day;
+    </select>
+    
+    <!-- GC 04/11/2015 -->
+    <select id="getDayStatisticJoinMeasuresAvg" parameterType="net.wedjaa.wetnet.business.dao.params.DataMeasuresFilter" resultMap="dayStatisticJoinMeasuresResultMap">
+        SELECT avg(s.min_night) as min_night, avg(s.avg_day) as avg_day, avg(s.max_day) as max_day, avg(s.min_day) as min_day, 
+        avg(s.range) as RANGE_AVG, avg(s.standard_deviation) as standard_deviation, avg(m.alarm_min_threshold) as ALARM_MIN_THRESHOLD, 
+        avg(m.alarm_max_threshold) as ALARM_MAX_THRESHOLD,m.id_measures, m.name AS nameMeasures
+        FROM measures_day_statistic AS s
+        INNER JOIN measures AS m ON (s.measures_id_measures = m.id_measures)
+        WHERE s.day &gt;= #{startdate} AND s.day &lt;= #{enddate} AND s.measures_id_measures = #{measuresIdMeasures} ;
+    </select>
+        
+</mapper>
+
+    

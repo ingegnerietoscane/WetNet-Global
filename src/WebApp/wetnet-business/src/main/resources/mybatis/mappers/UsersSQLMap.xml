@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="users">
+
+    <resultMap id="resultMap" type="net.wedjaa.wetnet.business.domain.Users">
+        <result property="idusers" column="idusers" />
+        <result property="name" column="name" />
+        <result property="surname" column="surname" />
+        <result property="email" column="email" />
+        <result property="telephone_number" column="telephone_number" />
+        <result property="username" column="username" />
+        <result property="password" column="password" />
+        <result property="email_enabled" column="email_enabled" />
+        <result property="sms_enabled" column="sms_enabled" />
+        <result property="role" column="role" />
+    </resultMap>
+    
+    <resultMap id="resultMapUsersHasDisticricts" type="net.wedjaa.wetnet.business.domain.UsersHasDistricts">
+        <result property="users_idusers" column="users_idusers" />
+        <result property="districts_id_districts" column="districts_id_districts" />
+        <result property="districts_name" column="name" />
+        <result property="events_notification" column="events_notification" />
+    </resultMap>
+    
+    <select id="getAll" resultMap="resultMap">
+    	SELECT * FROM users
+    </select>
+    
+    <select id="getBydId" resultMap="resultMap" parameterType="java.lang.Long">
+    	SELECT * FROM users where users.idusers = #{value}
+    </select>
+    
+    <select id="getByUserName" resultMap="resultMap" parameterType="java.lang.String">
+    	SELECT * FROM users where users.username = #{value}
+    </select>
+    
+    <update id="update" parameterType="net.wedjaa.wetnet.business.domain.Users">
+	  	update users set
+	    username = #{username},
+	    password = #{password},
+	    email = #{email},
+	    name = #{name},
+	    surname = #{surname},
+	    telephone_number = #{telephone_number},
+	    email_enabled = #{email_enabled},
+	    sms_enabled = #{sms_enabled},
+	    role = #{role}
+	  	where users.idusers = #{idusers}
+	</update>
+	
+	<insert id="insert" parameterType="net.wedjaa.wetnet.business.domain.Users" useGeneratedKeys="true" keyProperty="idusers">
+		insert into users (username,password,email,name,surname,telephone_number,email_enabled,sms_enabled, role)
+		values (#{username},#{password},#{email},#{name},#{surname},#{telephone_number},#{email_enabled},#{sms_enabled}, #{role})
+	</insert>
+	
+	<delete id="delete" parameterType="java.lang.Long">
+  		delete from users where users.idusers = #{value}
+	</delete>
+	
+    <select id="getUsersHasDistrictBydIdusers" resultMap="resultMapUsersHasDisticricts" parameterType="java.lang.Long">
+    	SELECT users_has_districts.*, districts.name FROM users_has_districts inner join districts on (districts_id_districts = id_districts) where users_has_districts.users_idusers = #{value}
+    </select>
+    
+    <update id="updateUsersHasDistricts" parameterType="net.wedjaa.wetnet.business.domain.UsersHasDistricts">
+	  	update users_has_districts set
+	    events_notification = #{events_notification}
+	  	where users_has_districts.users_idusers = #{users_idusers} and users_has_districts.districts_id_districts = #{districts_id_districts}
+	</update>
+	
+	<insert id="insertUsersHasDistricts" parameterType="net.wedjaa.wetnet.business.domain.UsersHasDistricts" >
+		insert into users_has_districts (districts_id_districts,users_idusers)
+		values (#{districts_id_districts},#{users_idusers})
+	</insert>
+	
+	<delete id="deleteUsersHasDistricts" parameterType="net.wedjaa.wetnet.business.domain.UsersHasDistricts">
+  		delete from users_has_districts  where users_idusers = #{users_idusers} and districts_id_districts = #{districts_id_districts} 
+	</delete>
+	
+</mapper>

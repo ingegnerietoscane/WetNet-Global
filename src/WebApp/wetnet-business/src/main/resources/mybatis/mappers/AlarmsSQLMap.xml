@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="alarms">
+
+    <resultMap id="resultMap" type="net.wedjaa.wetnet.business.domain.Alarms">
+        <result property="measures_id_measures" column="measures_id_measures" />
+        <result property="timestamp" column="timestamp" />
+        <result property="alarm_type" column="alarm_type" />
+        <result property="event_type" column="event_type" />
+        <result property="alarm_value" column="alarm_value" />
+        <result property="reference_value" column="reference_value" />
+        <result property="duration" column="duration" />
+    </resultMap>
+	
+   
+        <select id="getAll" resultMap="resultMap" parameterType="net.wedjaa.wetnet.business.dao.params.DataAlarmsFilter">
+    	SELECT a.timestamp, a.alarm_type, a.event_type, a.alarm_value, a.reference_value, a.measures_id_measures,m.name as measures_name
+    	FROM measures_alarms as a 
+    	inner join measures as m on (a.measures_id_measures  = m.id_measures) 
+    	 <if test="user != null">
+        	inner join measures_has_districts as md on m.id_measures = md.measures_id_measures
+    		inner join users_has_districts as ud on (ud.districts_id_districts = md.districts_id_districts)
+    		where ud.users_idusers = #{user.idusers}
+  		</if>
+    	ORDER BY a.timestamp desc
+    </select>
+    
+    
+     <select id="getLastByMeasure" resultMap="resultMap" parameterType="net.wedjaa.wetnet.business.dao.params.DataAlarmsFilter">
+    	SELECT a.timestamp, a.alarm_type, a.event_type, a.alarm_value, a.reference_value, CONCAT('',TIMEDIFF(NOW(),a.timestamp)) as duration, a.measures_id_measures,m.name as measures_name
+    	FROM measures_alarms as a 
+    	inner join measures as m on (a.measures_id_measures  = m.id_measures) 
+    	<if test="user != null">
+        	inner join measures_has_districts as md on m.id_measures = md.measures_id_measures
+    		inner join users_has_districts as ud on (ud.districts_id_districts = md.districts_id_districts) 
+    		where ud.users_idusers = #{user.idusers}
+    		and measures_id_measures = #{measure.idMeasures}
+  		</if>
+  		<if test="user == null">
+  		where measures_id_measures = #{measure.idMeasures}
+        </if>
+    	ORDER BY a.timestamp desc 
+    	LIMIT 1
+    </select>
+     
+     <select id="getAllByMeasure" resultMap="resultMap" parameterType="net.wedjaa.wetnet.business.dao.params.DataAlarmsFilter">
+    	SELECT a.timestamp, a.alarm_type, a.event_type, a.alarm_value, a.reference_value, a.measures_id_measures,m.name as measures_name
+    	FROM measures_alarms as a 
+    	inner join measures as m on (a.measures_id_measures  = m.id_measures) 
+    	<if test="user != null">
+        	inner join measures_has_districts as md on m.id_measures = md.measures_id_measures
+    		inner join users_has_districts as ud on (ud.districts_id_districts = md.districts_id_districts) 
+    		where ud.users_idusers = #{user.idusers}
+    		and measures_id_measures = #{measure.idMeasures}
+  		</if>
+  		<if test="user == null">
+  		where measures_id_measures = #{measure.idMeasures}
+        </if>
+    	ORDER BY a.timestamp desc
+    </select>
+    
+    <select id="getAllActive" resultMap="resultMap" parameterType="net.wedjaa.wetnet.business.dao.params.DataAlarmsFilter">
+    	SELECT a.timestamp, a.alarm_type, a.event_type, a.alarm_value, a.reference_value, CONCAT('',TIMEDIFF(NOW(),a.timestamp)) as duration, a.measures_id_measures,m.name as measures_name
+		FROM measures_alarms as a 
+    	inner join measures as m on (a.measures_id_measures  = m.id_measures) 
+    	<if test="user != null">
+        	inner join measures_has_districts as md on m.id_measures = md.measures_id_measures
+    		inner join users_has_districts as ud on (ud.districts_id_districts = md.districts_id_districts)
+    		where ud.users_idusers = #{user.idusers}
+  		</if>
+		where a.timestamp = (
+			SELECT MAX(b.timestamp) 
+            from measures_alarms as b
+            where b.measures_id_measures= a.measures_id_measures
+            )
+        group by a.measures_id_measures
+		order by a.timestamp desc
+    </select>
+     
+     <select id="getAllActiveByMeasure" resultMap="resultMap" parameterType="net.wedjaa.wetnet.business.dao.params.DataAlarmsFilter">
+    	<!-- SELECT a.timestamp, a.alarm_type, a.event_type, a.alarm_value, a.reference_value, DATEDIFF(DATE_FORMAT(NOW(),'%Y-%m-%d'),a.timestamp) as duration,a.measures_id_measures,m.name as measures_name
+    	 -->
+    	SELECT a.timestamp, a.alarm_type, a.event_type, a.alarm_value, a.reference_value, CONCAT('',TIMEDIFF(NOW(),a.timestamp)) as duration, a.measures_id_measures,m.name as measures_name
+    	FROM measures_alarms as a 
+    	inner join measures as m on (a.measures_id_measures  = m.id_measures) 
+    	<if test="user != null">
+        	inner join measures_has_districts as md on m.id_measures = md.measures_id_measures
+    		inner join users_has_districts as ud on (ud.districts_id_districts = md.districts_id_districts) 
+    		where ud.users_idusers = #{user.idusers}
+    		and a.measures_id_measures = #{measure.idMeasures}
+  		</if>
+    	<if test="user == null">
+  		where a.measures_id_measures = #{measure.idMeasures}
+        </if>
+        and a.timestamp = (
+			SELECT MAX(b.timestamp) 
+            from measures_alarms as b
+            where b.measures_id_measures= #{measure.idMeasures})
+        group by a.measures_id_measures
+    	ORDER BY a.timestamp desc
+    </select>
+    
+    
+    <select id="getAllClose" resultMap="resultMap" parameterType="net.wedjaa.wetnet.business.dao.params.DataAlarmsFilter">
+    	SELECT a.timestamp, a.alarm_type, a.event_type, a.alarm_value, a.reference_value, CONCAT('',a.duration) as duration,a.measures_id_measures,m.name as measures_name
+    	FROM measures_alarms as a 
+    	inner join measures as m on (a.measures_id_measures  = m.id_measures) 
+    	 <if test="user != null">
+        	inner join measures_has_districts as md on m.id_measures = md.measures_id_measures
+    		inner join users_has_districts as ud on (ud.districts_id_districts = md.districts_id_districts)
+    		where ud.users_idusers = #{user.idusers} and a.event_type=2
+  		</if>
+  		 <if test="user == null">
+  		 where a.event_type=2
+  		 </if>
+  		 and DATEDIFF(DATE_FORMAT(NOW(),'%Y-%m-%d'),DATE_FORMAT(a.timestamp,'%Y-%m-%d')) &lt;=3
+    	 ORDER BY a.timestamp desc
+    </select>
+     
+     <select id="getAllCloseByMeasure" resultMap="resultMap" parameterType="net.wedjaa.wetnet.business.dao.params.DataAlarmsFilter">
+    	SELECT a.timestamp, a.alarm_type, a.event_type, a.alarm_value, a.reference_value, CONCAT('',a.duration) as duration,a.measures_id_measures,m.name as measures_name
+    	FROM measures_alarms as a 
+    	inner join measures as m on (a.measures_id_measures  = m.id_measures) 
+    	<if test="user != null">
+        	inner join measures_has_districts as md on m.id_measures = md.measures_id_measures
+    		inner join users_has_districts as ud on (ud.districts_id_districts = md.districts_id_districts) 
+    		where ud.users_idusers = #{user.idusers}
+    		and measures_id_measures = #{measure.idMeasures}
+  		</if>
+  		<if test="user == null">
+  		where measures_id_measures = #{measure.idMeasures}
+        </if>
+        and a.event_type=2
+        and DATEDIFF(DATE_FORMAT(NOW(),'%Y-%m-%d'),DATE_FORMAT(a.timestamp,'%Y-%m-%d')) &lt;=3
+    	ORDER BY a.timestamp desc
+    </select>
+    
+    
+</mapper>

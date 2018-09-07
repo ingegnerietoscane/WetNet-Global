@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="measuresMeterReading">
+
+       <resultMap id="resultMap" type="net.wedjaa.wetnet.business.domain.MeasuresMeterReading">
+         <result property="timestamp" column="timestamp" />
+          <result property="value" column="value" />
+         <result property="idUserreader" column="id_userreader" />
+         <result property="idMeasures" column="measures_id_measures" />
+    </resultMap>
+        
+	
+	<insert id="insert" parameterType="net.wedjaa.wetnet.business.domain.MeasuresMeterReading" >
+		insert into meter_readings (timestamp, value, id_userreader, measures_id_measures)
+		values (#{timestamp}, #{value}, #{idUserreader}, #{idMeasures})
+	</insert>
+	
+	<select id="getAllByMeasure" resultMap="resultMap">
+        SELECT * FROM meter_readings WHERE measures_id_measures = #{idMeasures} order by timestamp desc;
+    </select>
+    
+    <select id="getLastByIdMeasure" resultMap="resultMap">
+        SELECT * FROM meter_readings WHERE measures_id_measures = #{idMeasures} order by timestamp desc LIMIT 1;
+    </select>
+</mapper>

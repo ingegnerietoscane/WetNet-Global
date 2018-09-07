@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapView">
+
+    <resultMap id="resultMap" type="net.wedjaa.wetnet.business.domain.MapView">
+        <result property="id_map_view" column="id_map_view" />
+        <result property="kml" column="kml" />
+    </resultMap>
+        
+    <select id="getAll" resultMap="resultMap">
+    	SELECT * FROM map_view
+    </select>
+    
+    <select id="getKML" resultMap="resultMap" parameterType="java.lang.Integer">
+        SELECT * FROM map_view WHERE id_map_view = #{id}
+    </select>
+    
+    <select id="getLayer" resultMap="resultMap" parameterType="java.lang.Long">
+        SELECT * FROM map_view WHERE map_view.id_map_view = #{id_map_view}
+    </select>
+        
+    <update id="update" parameterType="net.wedjaa.wetnet.business.domain.MapView">
+	  	update map_view set
+	    kml = #{kml}
+	  	where map_view.id_map_view = #{id_map_view}
+	</update>
+	
+	<insert id="insert" parameterType="net.wedjaa.wetnet.business.domain.MapView"><!-- useGeneratedKeys="false" keyProperty="id_map_view" -->
+		insert into map_view (id_map_view, kml)
+		values (#{id_map_view}, #{kml})
+	</insert>
+	
+	<delete id="delete" parameterType="java.lang.Long">
+  		delete from map_view where map_view.id_map_view = #{value}
+	</delete>
+	
+</mapper>

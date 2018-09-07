@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="events">
+
+    <resultMap id="resultMap" type="net.wedjaa.wetnet.business.domain.Events">
+        <result property="districts_id_districts" column="districts_id_districts" />
+        <result property="district_name" column="district_name" />
+        <result property="description" column="description" />
+        <result property="type" column="type" />
+        <result property="ranking" column="ranking" />
+        <result property="delta_value" column="delta_value" />
+        <result property="day" column="day" />
+        <result property="duration" column="duration" />
+        <result property="value" column="value" />
+        
+        <!-- GC 11/11/2015 -->
+        <result property="district_ev_variable_type" column="district_ev_variable_type"/>
+        
+    </resultMap>
+	
+    <resultMap id="resultMapEvents" type="net.wedjaa.wetnet.business.domain.EventsTypeNum">
+        <result property="num" column="num" />
+        <result property="type" column="type" />
+        <result property="item" column="item" />
+        <result property="id" column="id" />
+    </resultMap>
+    
+    <select id="getAll" resultMap="resultMap">
+    	SELECT e.*, d.name as district_name, d.ev_variable_type as district_ev_variable_type FROM districts_events as e 
+    	inner join districts as d on (e.districts_id_districts  = d.id_districts) ORDER BY e.ranking, e.day, d.name
+    </select>
+    
+    <select id="getAllByDate" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="resultMap">
+        SELECT e.*, d.name AS district_name, d.ev_variable_type as district_ev_variable_type FROM districts_events AS e 
+        INNER JOIN districts AS d ON (e.districts_id_districts  = d.id_districts)
+        <if test="idusers != null">
+            INNER JOIN users_has_districts AS ud ON (ud.districts_id_districts = d.id_districts)
+        </if>
+        WHERE e.day &gt;= #{startdate} AND e.day &lt;= #{enddate} AND e.type != '0'
+        <if test="idusers != null">
+            AND ud.users_idusers = #{idusers}
+        </if>
+        ORDER BY e.day DESC, d.name
+    </select>
+    
+    <select id="getAllByDateAndDistrict" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="resultMap">
+        SELECT e.*, d.name as district_name, d.ev_variable_type as district_ev_variable_type FROM districts_events as e 
+        inner join districts as d on (e.districts_id_districts  = d.id_districts) 
+        where 
+        e.day &gt;= #{startdate} and e.day &lt;= #{enddate} AND e.type != '0'
+        and districts_id_districts = #{idDistrict}
+        ORDER BY e.day DESC, d.name
+    </select>
+    
+    <select id="getbyDateAndDistrictId" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="resultMap">
+        SELECT e.*, d.name as district_name, d.ev_variable_type as district_ev_variable_type FROM districts_events as e 
+        inner join districts as d on (e.districts_id_districts  = d.id_districts) 
+        where 
+		e.day &gt;= #{startdate} and e.day &lt;= #{enddate} AND e.type != '0'
+		and districts_id_districts = #{idDistrict}
+        ORDER BY e.day
+    </select>
+    
+    <select id="getbyDateAndZone" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="resultMap">
+        SELECT e.*, d.name as district_name, d.ev_variable_type as district_ev_variable_type FROM districts_events as e 
+        inner join districts as d on (e.districts_id_districts  = d.id_districts) 
+        where 
+        e.day &gt;= #{startdate} and e.day &lt;= #{enddate}
+        and d.zone = #{zone}
+        ORDER BY e.day
+    </select>
+    
+    <select id="getbyDateAndMunicipality" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="resultMap">
+        SELECT e.*, d.name as district_name, d.ev_variable_type as district_ev_variable_type FROM districts_events as e 
+        inner join districts as d on (e.districts_id_districts  = d.id_districts) 
+        where 
+        e.day &gt;= #{startdate} and e.day &lt;= #{enddate}
+        and d.municipality = #{municipality}
+        ORDER BY e.day
+    </select>
+    
+    <select id="getEventsTypeNumByDistrict" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="resultMapEvents">
+        SELECT count(e.type) as num, e.type FROM districts_events AS e
+        INNER JOIN districts AS d ON (e.districts_id_districts  = d.id_districts) WHERE 
+		e.day &gt;= #{startdate} AND e.day &lt;= #{enddate} AND districts_id_districts = #{idDistrict} GROUP BY e.type ORDER BY e.type
+    </select>
+    
+    <select id="getEventsTypeNumByZone" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="resultMapEvents">
+        SELECT count(e.type) AS num, e.type FROM districts_events AS e INNER JOIN districts AS d ON (e.districts_id_districts  = d.id_districts)
+        WHERE e.day &gt;= #{startdate} AND e.day &lt;= #{enddate} AND d.zone = #{zone} GROUP BY e.type ORDER BY e.type;
+    </select>
+    
+    <select id="getEventsTypeNumByMunicipality" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="resultMapEvents">
+        SELECT count(e.type) AS num, e.type FROM districts_events AS e INNER JOIN districts AS d ON (e.districts_id_districts  = d.id_districts)
+        WHERE e.day &gt;= #{startdate} AND e.day &lt;= #{enddate} AND d.municipality = #{municipality} GROUP BY e.type ORDER BY e.type;
+    </select>
+    
+    <select id="getEventsGroupByTypeDistrict" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="resultMapEvents">
+        SELECT COUNT(e.type) AS num, e.type, d.name AS item, d.id_districts AS id FROM districts_events AS e 
+        INNER JOIN districts AS d ON (e.districts_id_districts  = d.id_districts)
+        <if test="idusers != null">
+            INNER JOIN users_has_districts AS ud ON (ud.districts_id_districts = d.id_districts)
+        </if>
+        WHERE e.day &gt;= #{startdate} AND e.day &lt;= #{enddate}
+        <if test="idusers != null">
+            AND ud.users_idusers = #{idusers}
+        </if>
+        GROUP BY e.type, d.id_districts ORDER BY d.name;
+    </select>
+    
+    <select id="getEventsGroupByTypeZone" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="resultMapEvents">
+        SELECT COUNT(e.type) AS num, e.type, d.zone AS item FROM districts_events AS e 
+        INNER JOIN districts AS d ON (e.districts_id_districts  = d.id_districts)
+        <if test="idusers != null">
+            INNER JOIN users_has_districts AS ud ON (ud.districts_id_districts = d.id_districts)
+        </if>
+        WHERE e.day &gt;= #{startdate} AND e.day &lt;= #{enddate}
+        <if test="idusers != null">
+            AND ud.users_idusers = #{idusers}
+        </if>
+        GROUP BY e.type, d.zone ORDER BY d.zone;
+    </select>
+    
+    <select id="getEventsGroupByTypeMunicipality" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="resultMapEvents">
+        SELECT COUNT(e.type) AS num, e.type, d.municipality AS item FROM districts_events AS e 
+        INNER JOIN districts AS d ON (e.districts_id_districts  = d.id_districts)
+        <if test="idusers != null">
+            INNER JOIN users_has_districts AS ud ON (ud.districts_id_districts = d.id_districts)
+        </if>
+        WHERE e.day &gt;= #{startdate} AND e.day &lt;= #{enddate}
+        <if test="idusers != null">
+            AND ud.users_idusers = #{idusers}
+        </if>
+        GROUP BY e.type, d.municipality ORDER BY d.municipality;
+    </select>
+    
+    <select id="getDistrictEventsGroupByTypeDistrict" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="resultMapEvents">
+        SELECT COUNT(e.type) AS num, e.type, d.name AS item, d.id_districts AS id FROM districts_events AS e 
+        INNER JOIN districts AS d ON (e.districts_id_districts  = d.id_districts) WHERE d.id_districts = #{idDistrict} AND e.day &gt;= #{startdate} AND e.day &lt;= #{enddate}
+        GROUP BY e.type, d.id_districts ORDER BY d.name;
+    </select>
+    
+    <select id="getZoneEventsGroupByTypeZone" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="resultMapEvents">
+        SELECT COUNT(e.type) AS num, e.type, d.zone AS item FROM districts_events AS e 
+        INNER JOIN districts AS d ON (e.districts_id_districts  = d.id_districts) WHERE d.zone = #{zone} AND e.day &gt;= #{startdate} AND e.day &lt;= #{enddate}
+        GROUP BY e.type, d.zone ORDER BY d.zone;
+    </select>
+    
+    <select id="getMunicipalityEventsGroupByTypeMunicipality" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="resultMapEvents">
+        SELECT COUNT(e.type) AS num, e.type, d.municipality AS item FROM districts_events AS e 
+        INNER JOIN districts AS d ON (e.districts_id_districts  = d.id_districts) WHERE d.municipality = #{municipality} AND e.day &gt;= #{startdate} AND e.day &lt;= #{enddate}
+        GROUP BY e.type, d.municipality ORDER BY d.municipality;
+    </select>
+</mapper>

@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="districtsBandsHistory">
+    
+    <resultMap id="districtsBandsHistoryResultMap" type="net.wedjaa.wetnet.business.domain.DistrictsBandsHistory">
+        <result property="districtsIdDistricts" column="DISTRICTS_ID_DISTRICTS" />
+        <result property="timestamp" column="TIMESTAMP" />
+        <result property="highBand" column="HIGH_BAND" />
+        <result property="lowBand" column="LOW_BAND" />
+         <result property="districtName" column="name" />
+        
+    </resultMap>
+	
+	<insert id="insertDistrictsBandsHistory" parameterType="net.wedjaa.wetnet.business.domain.DistrictsBandsHistory">
+		INSERT INTO districts_bands_history (districts_id_districts, timestamp, high_band, low_band)
+    	VALUES (#{districtsIdDistricts}, #{timestamp}, #{highBand}, #{lowBand})
+	</insert>
+	
+	
+	 <select id="getAllBandsHistory" resultMap="districtsBandsHistoryResultMap" parameterType="java.lang.Long">
+        SELECT * FROM districts_bands_history where districts_id_districts = #{value} order by timestamp desc
+    </select>
+    
+  
+    <!-- GC 18/11/2015 granularita timestamp -->
+     <select id="getBandsHistoryByDateDistrictsAll" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="districtsBandsHistoryResultMap">
+   	    SELECT dbh.timestamp AS timestamp, dbh.high_band, dbh.low_band, 
+		dbh.districts_id_districts, d.name as name 
+    	FROM districts_bands_history AS dbh
+    	INNER JOIN districts as d ON d.id_districts = dbh.districts_id_districts 
+		WHERE 
+		dbh.timestamp &gt;= #{startdate} and dbh.timestamp &lt;= #{enddate}
+		and districts_id_districts = #{idDistrict}
+		order by d.name, timestamp;
+    </select>
+    
+     <!-- GC 18/11/2015 granularita hours -->
+     <select id="getBandsHistoryByDateDistrictsonHours" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="districtsBandsHistoryResultMap">
+   	   SELECT DATE_FORMAT(dbh.timestamp, '%Y-%m-%d %H:00:00') AS timestamp, avg(dbh.high_band) as high_band, avg(dbh.low_band) as low_band, 
+		dbh.districts_id_districts, d.name as name 
+    	FROM districts_bands_history AS dbh
+    	INNER JOIN districts as d ON d.id_districts = dbh.districts_id_districts 
+		WHERE 
+		DATE_FORMAT(dbh.timestamp, '%Y-%m-%d %H:00:00') &gt;= #{startdate} and date(dbh.timestamp) &lt;= #{enddate}
+		and districts_id_districts = #{idDistrict}
+		 group by d.name, DATE_FORMAT(dbh.timestamp, '%Y-%m-%d %H:00:00') order by d.name, timestamp;
+
+    </select>
+    
+    <!-- GC 13/11/2015 granularita media giornaliera-->
+     <select id="getBandsHistoryByDateDistrictsonDays" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="districtsBandsHistoryResultMap">
+   	    <!-- SELECT DATE_FORMAT(dbh.timestamp, '%Y-%m-%d 00:00:00') AS timestamp, avg(dbh.high_band) as high_band, avg(dbh.low_band) as low_band, dbh.districts_id_districts, d.name as name 
+    	FROM districts_bands_history AS dbh
+    	INNER JOIN districts as d ON d.id_districts = dbh.districts_id_districts 
+		WHERE 
+		DATE_FORMAT(dbh.timestamp, '%Y-%m-%d 00:00:00') &gt;= #{startdate} AND DATE_FORMAT(dbh.timestamp, '%Y-%m-%d 00:00:00') &lt;= #{enddate}
+		AND districts_id_districts = #{idDistrict}
+		group by d.name, date(dbh.timestamp) order by d.name, timestamp; -->
+		
+		
+		<!-- 07/06/2016 PRENDO L'ULTIMO VALORE SUL GIORNO ANZICHè LA MEDIA -->
+		
+		SELECT MAX(DATE_FORMAT(dbh.timestamp, '%Y-%m-%d 00:00:00')) AS timestamp, dbh.high_band as high_band, dbh.low_band as low_band, dbh.districts_id_districts, d.name as name 
+    	FROM districts_bands_history AS dbh
+    	INNER JOIN districts as d ON d.id_districts = dbh.districts_id_districts 
+		WHERE 
+		DATE_FORMAT(dbh.timestamp, '%Y-%m-%d 00:00:00') &gt;= #{startdate} AND DATE_FORMAT(dbh.timestamp, '%Y-%m-%d 00:00:00') &lt;= #{enddate}
+		AND districts_id_districts = #{idDistrict}      
+        group by d.name, DATE_FORMAT(dbh.timestamp, '%Y-%M-%d')
+        order by d.name, timestamp;      
+    </select>
+    
+     <!-- GC 18/11/2015 granularita mensile DATE_FORMAT(dbh.timestamp, '%Y-%m')-->
+     <select id="getBandsHistoryByDateDistrictsonMonths" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="districtsBandsHistoryResultMap">
+   	   SELECT DATE_FORMAT(dbh.timestamp, '%Y-%m-01') AS timestamp, avg(dbh.high_band) as high_band, avg(dbh.low_band) as low_band, 
+		dbh.districts_id_districts, d.name as name 
+    	FROM districts_bands_history AS dbh
+    	INNER JOIN districts as d ON d.id_districts = dbh.districts_id_districts 
+		WHERE 
+		date(dbh.timestamp)  &gt;= #{startdate} and date(dbh.timestamp) &lt;= #{enddate}
+		and districts_id_districts = #{idDistrict}
+		 group by d.name, DATE_FORMAT(dbh.timestamp, '%Y-%m') order by d.name, timestamp;
+    </select>
+    
+     <!-- GC 18/11/2015 granularita annuale DATE_FORMAT(dbh.timestamp, '%Y')-->
+     <select id="getBandsHistoryByDateDistrictsonYears" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="districtsBandsHistoryResultMap">
+   	   SELECT DATE_FORMAT(dbh.timestamp, '%Y-01-01') AS timestamp, avg(dbh.high_band) as high_band, avg(dbh.low_band) as low_band, 
+		dbh.districts_id_districts, d.name as name 
+    	FROM districts_bands_history AS dbh
+    	INNER JOIN districts as d ON d.id_districts = dbh.districts_id_districts 
+		WHERE 
+		date(dbh.timestamp) &gt;= #{startdate} and date(dbh.timestamp) &lt;= #{enddate}
+		and districts_id_districts = #{idDistrict}
+		 group by d.name, DATE_FORMAT(dbh.timestamp, '%Y') order by d.name, timestamp;
+    </select>
+    
+   
+    <!-- MEDIA -->
+    <select id="getBandsHistoryAVGByDateDistricts" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="districtsBandsHistoryResultMap">
+   	   <!--  SELECT avg(dbh.high_band) as high_band, avg(dbh.low_band) as low_band, dbh.districts_id_districts, d.name as name
+   	    FROM districts_bands_history AS dbh
+    	INNER JOIN districts as d ON d.id_districts = dbh.districts_id_districts 
+		WHERE 
+		DATE_FORMAT(dbh.timestamp, '%Y-%m-%d 00:00:00') &gt;= #{startdate} AND DATE_FORMAT(dbh.timestamp, '%Y-%m-%d 00:00:00') &lt;= #{enddate}
+		AND districts_id_districts = #{idDistrict}-->
+		
+		 SELECT avg(dbh.high_band) as high_band, avg(dbh.low_band) as low_band, dbh.districts_id_districts, d.name as name
+   	    FROM districts_bands_history AS dbh
+    	INNER JOIN districts as d ON d.id_districts = dbh.districts_id_districts 
+		WHERE 
+		date(dbh.timestamp) &gt;= #{startdate} and date(dbh.timestamp) &lt;= #{enddate}
+		AND districts_id_districts = #{idDistrict}
+		
+    </select>
+    
+    
+    
+    <!-- 16/02/2016 seleziono primo valore utile delle bande -->
+   <select id="getFirstBandsHistoryByDistrictsOnTimestampAsc" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="districtsBandsHistoryResultMap">
+   	  SELECT DATE_FORMAT(dbh.timestamp, '%Y-%m-%d 00:00:00') AS timestamp, dbh.high_band, dbh.low_band, 
+		dbh.districts_id_districts, d.name as name 
+    	FROM districts_bands_history AS dbh
+    	INNER JOIN districts as d ON d.id_districts = dbh.districts_id_districts 
+		WHERE districts_id_districts = #{idDistrict}
+		and timestamp &gt;= #{enddate}
+		order by d.name, timestamp asc limit 1;
+     </select>
+        
+    <!-- 16/02/2016 seleziono ultimo valore utile delle bande -->
+     <select  id="getLastBandsHistoryByDistrictsOnTimestampDesc" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="districtsBandsHistoryResultMap">
+   	  SELECT DATE_FORMAT(dbh.timestamp, '%Y-%m-%d 00:00:00') AS timestamp, dbh.high_band, dbh.low_band, 
+		dbh.districts_id_districts, d.name as name 
+    	FROM districts_bands_history AS dbh
+    	INNER JOIN districts as d ON d.id_districts = dbh.districts_id_districts 
+		WHERE districts_id_districts = #{idDistrict}
+		and timestamp &lt;= #{enddate}
+		order by d.name, timestamp desc limit 1;
+     </select>
+</mapper>
+

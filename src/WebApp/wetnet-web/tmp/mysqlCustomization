@@ -1,0 +1,4 @@
+modifiche per mysql
+
+max_allowed_packet
+innodb_log_file_size=256M

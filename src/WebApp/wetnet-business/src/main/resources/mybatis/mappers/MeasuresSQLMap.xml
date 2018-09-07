@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="measures">
+        
+     <resultMap id="measuresResultMap" type="net.wedjaa.wetnet.business.domain.Measures">
+        <result property="idMeasures" column="ID_MEASURES" />
+        <result property="name" column="NAME" />
+        <result property="description" column="DESCRIPTION" />
+		 <result property="type" column="type" />
+    	 
+    	 <!-- GC - 22/10/2015 -->
+    	 <!-- <result property="reliable" column="reliable" /> -->
+    	 
+    	 <result property="update_timestamp" column="update_timestamp" />
+    	 <result property="min_night_start_time" column="min_night_start_time" />
+    	 <result property="min_night_stop_time" column="min_night_stop_time" />
+	   	 
+	   	 <!-- /* GC - 22/10/2015 */ 
+    	 <result property="max_day_start_time_1" column="max_day_start_time_1" />
+  		 <result property="max_day_stop_time_1" column="max_day_stop_time_1" />
+		 <result property="max_day_start_time_2" column="max_day_start_time_2" />
+		 <result property="max_day_stop_time_2" column="max_day_stop_time_2" /> 
+		 <result property="max_day_start_time_3" column="max_day_start_time_3" /> 
+		 <result property="max_day_stop_time_3" column="max_day_stop_time_3" /> 
+		 -->
+		 
+		 <result property="energy_category" column="energy_category" /> 
+		 <result property="energy_specific_content" column="energy_specific_content" /> 
+		 <result property="strumentation_type" column="strumentation_type" /> 
+		 <result property="strumentation_model" column="strumentation_model" /> 
+		 <result property="strumentation_serial_number" column="strumentation_serial_number" /> 
+		 <result property="strumentation_link_type" column="strumentation_link_type" /> 
+		 <result property="sap_code" column="sap_code" /> 
+		 <result property="fixed_value" column="fixed_value" /> 
+		 <result property="epanet_object_id" column="epanet_object_id" /> 
+		 <result property="critical" column="critical" /> 
+		 <result property="x_position" column="x_position" /> 
+		 <result property="y_position" column="y_position" /> 
+		 <result property="z_position" column="z_position" /> 
+		 <result property="alarm_thresholds_enable" column="alarm_thresholds_enable" /> 
+		 <result property="alarm_min_threshold" column="alarm_min_threshold" /> 
+		 <result property="alarm_max_threshold" column="alarm_max_threshold" /> 
+		 <result property="alarm_constant_check_enable" column="alarm_constant_check_enable" /> 
+		 <result property="alarm_constant_hysteresis" column="alarm_constant_hysteresis" /> 
+		 <result property="alarm_constant_check_time" column="alarm_constant_check_time" /> 
+		 <result property="table_name" column="table_name" /> 
+		 <result property="table_relational_id_column" column="table_relational_id_column" /> 
+		 <result property="table_relational_id_value" column="table_relational_id_value" /> 
+		 <result property="table_relational_id_type" column="table_relational_id_type" /> 
+		 <result property="table_timestamp_column" column="table_timestamp_column" /> 
+		 <result property="table_value_column" column="table_value_column" />
+		 <result property="orientation_degrees" column="orientation_degrees" /> 
+		 <result property="connections_id_odbcdsn" column="connections_id_odbcdsn" /> 
+		 
+		 <!-- GC 11/11/2015 -->
+		 <result property="aeeg_code" column="aeeg_code"/>
+		  <result property="gis_code" column="gis_code"/>
+		   <result property="roughness" column="roughness"/>
+		    <result property="diameter" column="diameter"/>
+		     <result property="multiplication_factor" column="multiplication_factor"/>
+		      <result property="source" column="source"/>
+		       <result property="alarm_threshold_check_time" column="alarm_threshold_check_time"/>
+		 
+		 
+         <result property="map" column="map" /> 
+    </resultMap>
+    
+    
+    <!-- GC - 29/10/2015 -->
+    <resultMap id="measuresWithSignResultMap" type="net.wedjaa.wetnet.business.domain.MeasuresWithSign">
+        <result property="idMeasures" column="ID_MEASURES" />
+        <result property="name" column="NAME" />
+        <result property="description" column="DESCRIPTION" />
+		 <result property="type" column="type" />
+    	 <result property="update_timestamp" column="update_timestamp" />
+    	 <result property="min_night_start_time" column="min_night_start_time" />
+    	 <result property="min_night_stop_time" column="min_night_stop_time" />
+	   	 <result property="energy_category" column="energy_category" /> 
+		 <result property="energy_specific_content" column="energy_specific_content" /> 
+		 <result property="strumentation_type" column="strumentation_type" /> 
+		 <result property="strumentation_model" column="strumentation_model" /> 
+		 <result property="strumentation_serial_number" column="strumentation_serial_number" /> 
+		 <result property="strumentation_link_type" column="strumentation_link_type" /> 
+		 <result property="sap_code" column="sap_code" /> 
+		 <result property="fixed_value" column="fixed_value" /> 
+		 <result property="epanet_object_id" column="epanet_object_id" /> 
+		 <result property="critical" column="critical" /> 
+		 <result property="x_position" column="x_position" /> 
+		 <result property="y_position" column="y_position" /> 
+		 <result property="z_position" column="z_position" /> 
+		 <result property="alarm_thresholds_enable" column="alarm_thresholds_enable" /> 
+		 <result property="alarm_min_threshold" column="alarm_min_threshold" /> 
+		 <result property="alarm_max_threshold" column="alarm_max_threshold" /> 
+		 <result property="alarm_constant_check_enable" column="alarm_constant_check_enable" /> 
+		 <result property="alarm_constant_hysteresis" column="alarm_constant_hysteresis" /> 
+		 <result property="alarm_constant_check_time" column="alarm_constant_check_time" /> 
+		 <result property="table_name" column="table_name" /> 
+		 <result property="table_relational_id_column" column="table_relational_id_column" /> 
+		 <result property="table_relational_id_value" column="table_relational_id_value" /> 
+		 <result property="table_relational_id_type" column="table_relational_id_type" /> 
+		 <result property="table_timestamp_column" column="table_timestamp_column" /> 
+		 <result property="table_value_column" column="table_value_column" />
+		 <result property="connections_id_odbcdsn" column="connections_id_odbcdsn" /> 
+         <result property="map" column="map" /> 
+         <result property="sign" column="sign" />
+         
+         <!-- GC 11/11/2015 -->
+          <result property="orientation_degrees" column="orientation_degrees" /> 
+		 <result property="aeeg_code" column="aeeg_code"/>
+		  <result property="gis_code" column="gis_code"/>
+		   <result property="roughness" column="roughness"/>
+		    <result property="diameter" column="diameter"/>
+		     <result property="multiplication_factor" column="multiplication_factor"/>
+		      <result property="source" column="source"/>
+		      <result property="alarm_threshold_check_time" column="alarm_threshold_check_time"/>
+		 
+         
+    </resultMap>
+    
+    <select id="getAllMeasures" resultMap="measuresResultMap">
+        SELECT m.* FROM measures as m
+        <if test="idusers != null">
+        	inner join measures_has_districts as md on m.id_measures = md.measures_id_measures
+    		inner join users_has_districts as ud on (ud.districts_id_districts = md.districts_id_districts) where ud.users_idusers = #{idusers}
+  		</if>
+         order by name;
+    </select>
+    
+    <select id="getMeasuresByDistrictId" parameterType="java.lang.Long" resultMap="measuresResultMap">
+        SELECT m.* FROM measures as m inner join measures_has_districts as md on m.id_measures = md.measures_id_measures 
+        where md.districts_id_districts = #{value} order by name 
+    </select>
+    
+    
+    <!-- GC - 29/10/2015 -->
+    <select id="getMeasuresWithSignByDistrictId" parameterType="java.lang.Long" resultMap="measuresWithSignResultMap">
+        SELECT m.*,md.sign FROM measures as m inner join measures_has_districts as md on m.id_measures = md.measures_id_measures 
+        where md.districts_id_districts = #{value} order by name 
+    </select>
+    
+    
+    <select id="getById" resultMap="measuresResultMap" parameterType="java.lang.Long">
+    	SELECT * FROM measures where id_measures = #{value}
+    </select>
+    
+    <update id="updateMeasures" parameterType="net.wedjaa.wetnet.business.domain.Measures">
+	  	update measures set
+		 name = #{name},
+		 description = #{description}, 
+		 type = #{type},
+    	 <!-- GC - 22/10/2015 --> <!-- reliable = #{reliable}, -->
+	     update_timestamp = #{update_timestamp},
+	 	 min_night_start_time = #{min_night_start_time},
+	  	 min_night_stop_time = #{min_night_stop_time},
+	   	 <!-- /* GC - 22/10/2015 */ 
+    	 max_day_start_time_1 = #{max_day_start_time_1},
+	     max_day_stop_time_1 = #{max_day_stop_time_1},
+	     max_day_start_time_2 = #{max_day_start_time_2}, 
+		 max_day_stop_time_2 = #{max_day_stop_time_2}, 
+		 max_day_start_time_3 = #{max_day_start_time_3}, 
+		 max_day_stop_time_3 = #{max_day_stop_time_3}, 
+		 -->
+		 energy_category = #{energy_category}, 
+		 energy_specific_content = #{energy_specific_content}, 
+		 strumentation_type = #{strumentation_type}, 
+		 strumentation_model = #{strumentation_model}, 
+		 strumentation_serial_number = #{strumentation_serial_number}, 
+		 strumentation_link_type = #{strumentation_link_type}, 
+		 sap_code = #{sap_code}, 
+		 fixed_value = #{fixed_value}, 
+		 epanet_object_id = #{epanet_object_id}, 
+		 critical = #{critical}, 
+		 x_position = #{x_position}, 
+		 y_position = #{y_position}, 
+		 z_position = #{z_position}, 
+		 alarm_thresholds_enable = #{alarm_thresholds_enable}, 
+		 alarm_min_threshold = #{alarm_min_threshold}, 
+		 alarm_max_threshold = #{alarm_max_threshold}, 
+		 alarm_constant_check_enable = #{alarm_constant_check_enable}, 
+		 alarm_constant_hysteresis = #{alarm_constant_hysteresis}, 
+		 alarm_constant_check_time = #{alarm_constant_check_time}, 
+		 table_name = #{table_name}, 
+		 table_relational_id_column = #{table_relational_id_column}, 
+		 table_relational_id_value = #{table_relational_id_value}, 
+		 table_relational_id_type = #{table_relational_id_type}, 
+		 table_timestamp_column = #{table_timestamp_column}, 
+		 table_value_column = #{table_value_column}, 
+		 connections_id_odbcdsn = #{connections_id_odbcdsn},
+         map = #{map},
+          <!-- GC 11/11/2015 -->
+         aeeg_code = #{aeeg_code},
+         gis_code = #{gis_code},
+         roughness = #{roughness},
+         diameter = #{diameter},
+         multiplication_factor = #{multiplication_factor},
+         source = #{source},
+         orientation_degrees = #{orientation_degrees},
+         alarm_threshold_check_time = #{alarm_threshold_check_time}
+         where id_measures = #{idMeasures}
+	</update>
+
+
+	<insert id="insertMeasures" parameterType="net.wedjaa.wetnet.business.domain.Measures" keyProperty="idMeasures" useGeneratedKeys="true">
+	insert into measures (
+		 name, 
+		 description, 
+		 type,
+    	 <!-- GC - 22/10/2015 --> <!-- reliable, -->
+	     update_timestamp,
+	 	 min_night_start_time,
+	  	 min_night_stop_time,
+	   	 <!-- /* GC - 22/10/2015 */ 
+    	 max_day_start_time_1,
+	     max_day_stop_time_1,
+	     max_day_start_time_2, 
+		 max_day_stop_time_2, 
+		 max_day_start_time_3, 
+		 max_day_stop_time_3, 
+		 -->
+		 energy_category, 
+		 energy_specific_content, 
+		 strumentation_type, 
+		 strumentation_model, 
+		 strumentation_serial_number, 
+		 strumentation_link_type, 
+		 sap_code, 
+		 fixed_value, 
+		 epanet_object_id,
+		 critical, 
+		 x_position, 
+		 y_position, 
+		 z_position, 
+		 alarm_thresholds_enable, 
+		 alarm_min_threshold, 
+		 alarm_max_threshold, 
+		 alarm_constant_check_enable, 
+		 alarm_constant_hysteresis, 
+		 alarm_constant_check_time, 
+		 table_name, 
+		 table_relational_id_column, 
+		 table_relational_id_value, 
+		 table_relational_id_type, 
+		 table_timestamp_column, 
+		 table_value_column, 
+		 connections_id_odbcdsn,
+         map,
+         <!-- GC - 11/11/2015 -->
+         aeeg_code,
+         gis_code,
+         roughness,
+         diameter,
+         multiplication_factor,
+         source,
+         orientation_degrees,
+         alarm_threshold_check_time
+         )
+   	values (
+		 #{name},
+		 #{description}, 
+		 #{type},
+    	 <!-- GC - 22/10/2015 --> <!-- #{reliable}, -->
+	     #{update_timestamp},
+	 	 #{min_night_start_time},
+	  	 #{min_night_stop_time},
+	   	 <!-- /* GC - 22/10/2015 */ 
+    	 #{max_day_start_time_1},
+	     #{max_day_stop_time_1},
+	     #{max_day_start_time_2}, 
+		 #{max_day_stop_time_2}, 
+		 #{max_day_start_time_3}, 
+		 #{max_day_stop_time_3}, 
+		 -->
+		 #{energy_category}, 
+		 #{energy_specific_content}, 
+		 #{strumentation_type}, 
+		 #{strumentation_model}, 
+		 #{strumentation_serial_number}, 
+		 #{strumentation_link_type}, 
+		 #{sap_code}, 
+		 #{fixed_value}, 
+		 #{epanet_object_id},
+		 #{critical}, 
+		 #{x_position}, 
+		 #{y_position}, 
+		 #{z_position}, 
+		 #{alarm_thresholds_enable}, 
+		 #{alarm_min_threshold}, 
+		 #{alarm_max_threshold}, 
+		 #{alarm_constant_check_enable}, 
+		 #{alarm_constant_hysteresis}, 
+		 #{alarm_constant_check_time}, 
+		 #{table_name}, 
+		 #{table_relational_id_column}, 
+		 #{table_relational_id_value}, 
+		 #{table_relational_id_type}, 
+		 #{table_timestamp_column}, 
+		 #{table_value_column}, 
+		 #{connections_id_odbcdsn},
+         #{map},
+         <!-- GC 11/11/2015 -->
+         #{aeeg_code},
+         #{gis_code},
+         #{roughness},
+         #{diameter},
+         #{multiplication_factor},
+         #{source},
+         #{orientation_degrees},
+         #{alarm_threshold_check_time}
+    	 )
+	</insert>
+	
+	<delete id="deleteMeasures" parameterType="java.lang.Long">
+  		delete from measures where id_measures = #{value} 
+	</delete>
+    
+</mapper>
+
+    

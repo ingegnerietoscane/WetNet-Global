@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dataDistricts">
+        
+     <resultMap id="dataDistrictsResultMap" type="net.wedjaa.wetnet.business.domain.DataDistricts">
+        <result property="idDistricts" column="DISTRICTS_ID_DISTRICTS" />
+        <result property="timestamp" column="TIMESTAMP" />
+        <result property="value" column="VALUE" />
+        
+        <!-- GC - 22/10/2015 -->
+        <!-- <result property="reliable" column="RELIABLE" />  -->
+    </resultMap>
+    
+    <resultMap id="joinedDataDistrictsResultMap" type="net.wedjaa.wetnet.business.domain.DataDistricts">
+        <result property="timestamp" column="TIMESTAMP" />
+        <result property="value" column="VALUE" />
+        <result property="districtName" column="NAME" />
+        <result property="idDistricts" column="DISTRICTS_ID_DISTRICTS" />
+    </resultMap>
+	
+    <select id="getAllDataDistricts" resultMap="dataDistrictsResultMap">
+        SELECT * FROM data_districts order by timestamp asc;
+    </select>
+    
+    <select id="getDataDistrictsByDistrictId" parameterType="java.lang.Long"  resultMap="dataDistrictsResultMap">
+        SELECT * FROM data_districts WHERE districts_id_districts = #{value} order by timestamp asc;
+    </select>
+    
+    <select id="getJoinedDataDistricts" resultMap="joinedDataDistrictsResultMap">
+        SELECT d.name, date(data.timestamp) as timestamp, avg(data.value) as value FROM data_districts as data 
+		INNER JOIN districts as d ON d.id_districts = data.districts_id_districts 
+		group by d.name, date(data.timestamp) order by d.name, timestamp;
+    </select>
+    
+     <select id="getJoinedDataDistrictsByDistrictId" parameterType="java.lang.Long" resultMap="joinedDataDistrictsResultMap">
+        SELECT d.name, data.timestamp, data.value FROM data_districts as data INNER JOIN districts as d ON d.id_districts = data.districts_id_districts WHERE districts_id_districts = #{value} order by d.name, data.timestamp limit 100;
+    </select>
+   
+   
+      <!-- granularita timestamp -->
+    <select id="getJoinedAllDataDistrictsFilteredOnDates" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="joinedDataDistrictsResultMap">
+        SELECT CONCAT(d.name, ' [l/s]') as name, data.timestamp, data.value, data.districts_id_districts 
+        FROM data_districts as data  
+		INNER JOIN districts as d ON d.id_districts = data.districts_id_districts 
+		where 
+		data.timestamp &gt;= #{startdate} and data.timestamp &lt;= #{enddate}
+		and districts_id_districts = #{idDistrict}
+		order by d.name, timestamp;
+    </select>
+    
+      <!-- granularita media oraria -->
+    <select id="getJoinedDataDistrictsFilteredOnDatesAVGonHours" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="joinedDataDistrictsResultMap">
+        SELECT CONCAT(d.name, ' [l/s]') as name, DATE_FORMAT(data.timestamp, '%Y-%m-%d %H:00:00') as timestamp, avg(data.value) as value, data.districts_id_districts 
+        FROM data_districts as data 
+		INNER JOIN districts as d ON d.id_districts = data.districts_id_districts 
+		where 
+		DATE_FORMAT(data.timestamp, '%Y-%m-%d %H:00:00') &gt;= #{startdate} and date(data.timestamp) &lt;= #{enddate}
+		and districts_id_districts = #{idDistrict}
+		group by d.name, DATE_FORMAT(data.timestamp, '%Y-%m-%d %H:00:00') order by d.name, timestamp;
+    </select>
+    
+    <!-- granularita media giornaliera -->
+    <select id="getJoinedDataDistrictsFilteredOnDatesAVGonDays" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="joinedDataDistrictsResultMap">
+        SELECT CONCAT(d.name, ' [l/s]') as name, date(data.timestamp) as timestamp, avg(data.value) as value, data.districts_id_districts 
+        FROM data_districts as data 
+		INNER JOIN districts as d ON d.id_districts = data.districts_id_districts 
+		where 
+		date(data.timestamp) &gt;= #{startdate} and date(data.timestamp) &lt;= #{enddate}
+		and districts_id_districts = #{idDistrict}
+		group by d.name, date(data.timestamp) order by d.name, timestamp;
+    </select>
+    
+    <!-- granularita media mensile DATE_FORMAT(data.timestamp, '%Y-%m')-->
+    <select id="getJoinedDataDistrictsFilteredOnDatesAVGonMonths" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="joinedDataDistrictsResultMap">
+  		SELECT CONCAT(d.name, ' [l/s]') as name, DATE_FORMAT(data.timestamp, '%Y-%m-01') as timestamp, avg(data.value) as value, data.districts_id_districts 
+        FROM data_districts as data 
+		INNER JOIN districts as d ON d.id_districts = data.districts_id_districts 
+		where 
+		data.timestamp &gt;= #{startdate} and data.timestamp &lt;= #{enddate}
+		and districts_id_districts = #{idDistrict}
+		group by d.name, DATE_FORMAT(data.timestamp, '%Y-%m') order by d.name, data.timestamp;
+	</select>
+    
+    <!-- granularita media annuale DATE_FORMAT(data.timestamp, '%Y')-->
+    <select id="getJoinedDataDistrictsFilteredOnDatesAVGonYears" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="joinedDataDistrictsResultMap">
+  		SELECT CONCAT(d.name, ' [l/s]') as name, DATE_FORMAT(data.timestamp, '%Y-01-01') as timestamp, avg(data.value) as value, data.districts_id_districts 
+        FROM data_districts as data 
+		INNER JOIN districts as d ON d.id_districts = data.districts_id_districts 
+		where 
+		data.timestamp &gt;= #{startdate} and data.timestamp &lt;= #{enddate}
+		and districts_id_districts = #{idDistrict}
+		group by d.name, DATE_FORMAT(data.timestamp, '%Y') order by d.name, data.timestamp;
+	</select>
+   
+     <!-- GC 03/11/2015 MEDIA-->
+    <select id="getJoinedDataDistrictsFilteredOnDatesAVG" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="joinedDataDistrictsResultMap">
+        SELECT CONCAT(d.name, ' [l/s]') as name, avg(data.value) as value, data.districts_id_districts FROM data_districts as data 
+		INNER JOIN districts as d ON d.id_districts = data.districts_id_districts 
+		where 
+		date(data.timestamp) &gt;= #{startdate} and date(data.timestamp) &lt;= #{enddate}
+		and districts_id_districts = #{idDistrict}
+		group by d.name order by d.name;
+    </select>
+       
+   
+       <!-- districts_energy_profile granularita timestamp -->
+    <select id="getJoinedAllEnergyProfileFilteredOnDates" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="joinedDataDistrictsResultMap">
+        SELECT CONCAT(d.name, ' - energy [Kw]') as name, data.timestamp, data.value, data.districts_id_districts FROM districts_energy_profile as data  
+		INNER JOIN districts as d ON d.id_districts = data.districts_id_districts 
+		where 
+		data.timestamp &gt;= #{startdate} and data.timestamp &lt;= #{enddate}
+		and districts_id_districts = #{idDistrict}
+		order by d.name, timestamp;
+    </select>
+    
+     <!-- districts_energy_profile granularita oraria -->
+    <select id="getJoinedEnergyProfileFilteredOnDatesAVGonHours" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="joinedDataDistrictsResultMap">
+        SELECT CONCAT(d.name, ' - energy [Kw]') as name, DATE_FORMAT(data.timestamp, '%Y-%m-%d %H:00:00') as timestamp, avg(data.value) as value, data.districts_id_districts 
+        FROM districts_energy_profile as data 
+		INNER JOIN districts as d ON d.id_districts = data.districts_id_districts 
+		where 
+		DATE_FORMAT(data.timestamp, '%Y-%m-%d %H:00:00') &gt;= #{startdate} and date(data.timestamp) &lt;= #{enddate}
+		and districts_id_districts = #{idDistrict}
+		group by d.name, DATE_FORMAT(data.timestamp, '%Y-%m-%d %H:00:00') order by d.name, timestamp;
+    </select>
+    
+     <!-- districts_energy_profile granularita giornaliera -->
+    <select id="getJoinedEnergyProfileFilteredOnDatesAVGonDays" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="joinedDataDistrictsResultMap">
+        SELECT CONCAT(d.name, ' - energy [Kw]') as name, date(data.timestamp) as timestamp, avg(data.value) as value, data.districts_id_districts 
+        FROM districts_energy_profile as data 
+		INNER JOIN districts as d ON d.id_districts = data.districts_id_districts 
+		where 
+		date(data.timestamp) &gt;= #{startdate} and date(data.timestamp) &lt;= #{enddate}
+		and districts_id_districts = #{idDistrict}
+		group by d.name, date(data.timestamp) order by d.name, timestamp;
+    </select>
+    
+    
+     <!-- districts_energy_profile granularita mensile DATE_FORMAT(dbh.timestamp, '%Y-%m')-->
+    <select id="getJoinedEnergyProfileFilteredOnDatesAVGonMonths" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="joinedDataDistrictsResultMap">
+        SELECT CONCAT(d.name, ' - energy [Kw]') as name, DATE_FORMAT(data.timestamp, '%Y-%m-01') as timestamp, avg(data.value) as value, data.districts_id_districts 
+        FROM districts_energy_profile as data 
+		INNER JOIN districts as d ON d.id_districts = data.districts_id_districts 
+		where 
+		data.timestamp &gt;= #{startdate} and data.timestamp &lt;= #{enddate}
+		and districts_id_districts = #{idDistrict}
+		group by d.name, DATE_FORMAT(data.timestamp, '%Y-%m') order by d.name, timestamp;
+    </select>
+    
+     <!-- districts_energy_profile granularita annuale DATE_FORMAT(data.timestamp, '%Y')-->
+    <select id="getJoinedEnergyProfileFilteredOnDatesAVGonYears" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="joinedDataDistrictsResultMap">
+        SELECT CONCAT(d.name, ' - energy [Kw]') as name, DATE_FORMAT(data.timestamp, '%Y-01-01') as timestamp, avg(data.value) as value, data.districts_id_districts 
+        FROM districts_energy_profile as data 
+		INNER JOIN districts as d ON d.id_districts = data.districts_id_districts 
+		where 
+		data.timestamp &gt;= #{startdate} and data.timestamp &lt;= #{enddate}
+		and districts_id_districts = #{idDistrict}
+		group by d.name, DATE_FORMAT(data.timestamp, '%Y') order by d.name, timestamp;
+    </select>
+    
+      
+    <!-- GC 03/11/2015 districts_energy_profile MEDIA-->
+    <select id="getJoinedEnergyProfileFilteredOnDatesAVG" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="joinedDataDistrictsResultMap">
+        SELECT CONCAT(d.name, ' - energy [Kw]') as name, avg(data.value) as value, data.districts_id_districts 
+        FROM districts_energy_profile as data 
+		INNER JOIN districts as d ON d.id_districts = data.districts_id_districts 
+		where 
+		date(data.timestamp) &gt;= #{startdate} and date(data.timestamp) &lt;= #{enddate}
+		and districts_id_districts = #{idDistrict}
+		group by d.name order by d.name;
+    </select>
+        
+       <!-- districts_statistic_profiles granularita timestamp -->
+    <select id="getJoinedAllLossesProfileFilteredOnDates" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="joinedDataDistrictsResultMap">
+        SELECT CONCAT(d.name, ' - losses [l/s]') as name, data.timestamp, data.losses as value, data.districts_id_districts FROM districts_statistic_profiles as data  
+		INNER JOIN districts as d ON d.id_districts = data.districts_id_districts 
+		where 
+		data.timestamp &gt;= #{startdate} and data.timestamp &lt;= #{enddate}
+		and districts_id_districts = #{idDistrict}
+		order by d.name, timestamp;
+    </select>
+    
+       <!-- districts_statistic_profiles granularita oraria -->
+    <select id="getJoinedLossesProfileFilteredOnDatesAVGonHours" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="joinedDataDistrictsResultMap">
+        SELECT CONCAT(d.name, ' - losses [l/s]') as name, DATE_FORMAT(data.timestamp, '%Y-%m-%d %H:00:00') as timestamp, avg(data.losses) as value, data.districts_id_districts FROM districts_statistic_profiles as data 
+		INNER JOIN districts as d ON d.id_districts = data.districts_id_districts 
+		where 
+		DATE_FORMAT(data.timestamp, '%Y-%m-%d %H:00:00') &gt;= #{startdate} and date(data.timestamp) &lt;= #{enddate}
+		and districts_id_districts = #{idDistrict}
+		group by d.name, DATE_FORMAT(data.timestamp, '%Y-%m-%d %H:00:00') order by d.name, timestamp;
+    </select>
+    
+     <!-- districts_statistic_profiles granularita giornaliera -->
+    <select id="getJoinedLossesProfileFilteredOnDatesAVGonDays" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="joinedDataDistrictsResultMap">
+        SELECT CONCAT(d.name, ' - losses [l/s]') as name, date(data.timestamp) as timestamp, avg(data.losses) as value, data.districts_id_districts FROM districts_statistic_profiles as data 
+		INNER JOIN districts as d ON d.id_districts = data.districts_id_districts 
+		where 
+		date(data.timestamp) &gt;= #{startdate} and date(data.timestamp) &lt;= #{enddate}
+		and districts_id_districts = #{idDistrict}
+		group by d.name, date(data.timestamp) order by d.name, timestamp;
+    </select>
+    
+       <!-- districts_statistic_profiles granularita mensile DATE_FORMAT(data.timestamp, '%Y-%m')-->
+    <select id="getJoinedLossesProfileFilteredOnDatesAVGonMonths" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="joinedDataDistrictsResultMap">
+        SELECT CONCAT(d.name, ' - losses [l/s]') as name, DATE_FORMAT(data.timestamp, '%Y-%m-01') as timestamp, avg(data.losses) as value, data.districts_id_districts FROM districts_statistic_profiles as data 
+		INNER JOIN districts as d ON d.id_districts = data.districts_id_districts 
+		where 
+		data.timestamp &gt;= #{startdate} and data.timestamp &lt;= #{enddate}
+		and districts_id_districts = #{idDistrict}
+		group by d.name, DATE_FORMAT(data.timestamp, '%Y-%m') order by d.name, timestamp;
+    </select>
+    
+        <!-- districts_statistic_profiles granularita annuale DATE_FORMAT(data.timestamp, '%Y')-->
+    <select id="getJoinedLossesProfileFilteredOnDatesAVGonYears" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="joinedDataDistrictsResultMap">
+        SELECT CONCAT(d.name, ' - losses [l/s]') as name, DATE_FORMAT(data.timestamp, '%Y-01-01') as timestamp, avg(data.losses) as value, data.districts_id_districts FROM districts_statistic_profiles as data 
+		INNER JOIN districts as d ON d.id_districts = data.districts_id_districts 
+		where 
+		data.timestamp &gt;= #{startdate} and data.timestamp &lt;= #{enddate}
+		and districts_id_districts = #{idDistrict}
+		group by d.name, DATE_FORMAT(data.timestamp, '%Y') order by d.name, timestamp;
+    </select>
+    
+    <!-- GC 03/11/2015 districts_statistic_profiles MEDIA-->
+ <select id="getJoinedLossesProfileFilteredOnDatesAVG" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="joinedDataDistrictsResultMap">
+        SELECT CONCAT(d.name, ' - losses [l/s]') as name, avg(data.losses) as value, data.districts_id_districts 
+        FROM districts_statistic_profiles as data 
+		INNER JOIN districts as d ON d.id_districts = data.districts_id_districts 
+		where 
+		date(data.timestamp) &gt;= #{startdate} and date(data.timestamp) &lt;= #{enddate}
+		and districts_id_districts = #{idDistrict}
+		group by d.name order by d.name;
+    </select>
+    
+    
+    
+    
+
+
+</mapper>
+
+    

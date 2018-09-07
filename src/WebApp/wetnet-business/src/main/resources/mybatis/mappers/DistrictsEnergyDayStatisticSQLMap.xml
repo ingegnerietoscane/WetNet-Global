@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="districtsEnergyDayStatistic">
+
+    <resultMap id="resultMap" type="net.wedjaa.wetnet.business.domain.DistrictsEnergyDayStatistic">
+        <result property="districtsIdDistricts" column="districts_id_districts" />
+        <result property="iela" column="iela" />
+        <result property="ied" column="ied" />
+        <result property="epd" column="epd" />
+        <result property="dayType" column="day_type" />
+        <result property="day" column="day" />
+    </resultMap>
+ 
+    <resultMap id="resultMapCategory" type="net.wedjaa.wetnet.business.domain.EpdIedIela">
+        <result property="districtsIdDistricts" column="districts_id_districts" />
+        <result property="iela" column="iela" />
+        <result property="ied" column="ied" />
+        <result property="epd" column="epd" />
+        <result property="dayType" column="day_type" />
+        <result property="day" column="day" />
+        <result property="category" column="category" />
+        <result property="epdIelaDiff" column="epd_iela_diff" />
+    </resultMap>
+    
+    <select id="getDiffByDateAndDistrictId" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="resultMapCategory">
+        SELECT SUM(deds.iela) AS iela, (SUM(deds.epd) - SUM(deds.iela)) AS epd_iela_diff FROM districts_energy_day_statistic AS deds
+        INNER JOIN districts AS d ON (deds.districts_id_districts  = d.id_districts)
+        WHERE d.id_districts = #{idDistrict} AND deds.day &gt;= #{startdate} AND deds.day &lt;= #{enddate};
+    </select>
+    
+    <select id="getDiffByDateAndZone" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="resultMapCategory">
+        SELECT SUM(deds.iela) AS iela, (SUM(deds.epd) - SUM(deds.iela)) AS epd_iela_diff FROM districts_energy_day_statistic AS deds
+        INNER JOIN districts AS d ON (deds.districts_id_districts  = d.id_districts)
+        WHERE d.zone = #{zone} AND deds.day &gt;= #{startdate} AND deds.day &lt;= #{enddate};
+    </select>
+    
+    <select id="getDiffByDateAndMunicipality" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="resultMapCategory">
+        SELECT SUM(deds.iela) AS iela, (SUM(deds.epd) - SUM(deds.iela)) AS epd_iela_diff FROM districts_energy_day_statistic AS deds
+        INNER JOIN districts AS d ON (deds.districts_id_districts  = d.id_districts)
+        WHERE d.municipality = #{municipality} AND deds.day &gt;= #{startdate} AND deds.day &lt;= #{enddate};
+    </select>
+    
+    <select id="getAllDistrictsByDate" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="resultMapCategory">
+        SELECT SUM(deds.epd) AS epd, (SUM(deds.epd)/SUM(dds.avg_day*3.6*24)) AS ied, SUM(deds.iela) AS iela, d.name AS category FROM districts_energy_day_statistic AS deds
+        INNER JOIN districts AS d ON (deds.districts_id_districts  = d.id_districts)
+        INNER JOIN districts_day_statistic AS dds ON (dds.districts_id_districts  = d.id_districts AND deds.day = dds.day)
+        <if test="idusers != null">
+            INNER JOIN users_has_districts AS ud ON (ud.districts_id_districts = d.id_districts)
+        </if>
+        WHERE deds.day &gt;= #{startdate} AND deds.day &lt;= #{enddate}
+        <if test="idusers != null">
+            AND ud.users_idusers = #{idusers}
+        </if>
+        GROUP BY d.id_districts, d.name ORDER BY d.name;
+    </select>
+    
+    <select id="getAllMunicipalitiesByDate" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="resultMapCategory">
+        SELECT SUM(deds.epd) AS epd, (SUM(deds.epd)/SUM(dds.avg_day*3.6*24)) AS ied, SUM(deds.iela) AS iela, d.municipality AS category FROM districts_energy_day_statistic AS deds
+        INNER JOIN districts AS d ON (deds.districts_id_districts  = d.id_districts)
+        INNER JOIN districts_day_statistic AS dds ON (dds.districts_id_districts  = d.id_districts AND deds.day = dds.day)
+        <if test="idusers != null">
+            INNER JOIN users_has_districts AS ud ON (ud.districts_id_districts = d.id_districts)
+        </if>
+        WHERE deds.day &gt;= #{startdate} AND deds.day &lt;= #{enddate}
+        <if test="idusers != null">
+            AND ud.users_idusers = #{idusers}
+        </if>
+        GROUP BY d.municipality ORDER BY d.municipality;
+    </select>
+    
+    <select id="getAllZonesByDate" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="resultMapCategory">
+        SELECT SUM(deds.epd) AS epd, (SUM(deds.epd)/SUM(dds.avg_day*3.6*24)) AS ied, SUM(deds.iela) AS iela, d.zone AS category FROM districts_energy_day_statistic AS deds
+        INNER JOIN districts AS d ON (deds.districts_id_districts  = d.id_districts)
+        INNER JOIN districts_day_statistic AS dds ON (dds.districts_id_districts  = d.id_districts AND deds.day = dds.day)
+        <if test="idusers != null">
+            INNER JOIN users_has_districts AS ud ON (ud.districts_id_districts = d.id_districts)
+        </if>
+        WHERE deds.day &gt;= #{startdate} AND deds.day &lt;= #{enddate}
+        <if test="idusers != null">
+            AND ud.users_idusers = #{idusers}
+        </if>
+        GROUP BY d.zone ORDER BY d.zone;
+    </select>
+    
+    <select id="getDistrictEnergyByDate" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="resultMapCategory">
+        SELECT SUM(deds.epd) AS epd, (SUM(deds.epd)/SUM(dds.avg_day*3.6*24)) AS ied, SUM(deds.iela) AS iela, d.name AS category FROM districts_energy_day_statistic AS deds
+        INNER JOIN districts AS d ON (deds.districts_id_districts  = d.id_districts)
+        INNER JOIN districts_day_statistic AS dds ON (dds.districts_id_districts  = d.id_districts AND deds.day = dds.day)
+        WHERE d.id_districts = #{idDistrict} AND deds.day &gt;= #{startdate} AND deds.day &lt;= #{enddate} GROUP BY d.id_districts, d.name ORDER BY d.name;
+    </select>
+    
+    <select id="getMunicipalityEnergyByDate" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="resultMapCategory">
+        SELECT SUM(deds.epd) AS epd, (SUM(deds.epd)/SUM(dds.avg_day*3.6*24)) AS ied, SUM(deds.iela) AS iela, d.municipality AS category FROM districts_energy_day_statistic AS deds
+        INNER JOIN districts AS d ON (deds.districts_id_districts  = d.id_districts)
+        INNER JOIN districts_day_statistic AS dds ON (dds.districts_id_districts  = d.id_districts AND deds.day = dds.day)
+        WHERE d.municipality = #{municipality} AND deds.day &gt;= #{startdate} AND deds.day &lt;= #{enddate} GROUP BY d.municipality ORDER BY d.municipality;
+    </select>
+    
+    <select id="getZoneEnergyByDate" parameterType="net.wedjaa.wetnet.business.dao.params.DataDistrictsFilter" resultMap="resultMapCategory">
+        SELECT SUM(deds.epd) AS epd, (SUM(deds.epd)/SUM(dds.avg_day*3.6*24)) AS ied, SUM(deds.iela) AS iela, d.zone AS category FROM districts_energy_day_statistic AS deds
+        INNER JOIN districts AS d ON (deds.districts_id_districts  = d.id_districts)
+        INNER JOIN districts_day_statistic AS dds ON (dds.districts_id_districts  = d.id_districts AND deds.day = dds.day)
+        WHERE d.zone = #{zone} AND deds.day &gt;= #{startdate} AND deds.day &lt;= #{enddate} GROUP BY d.zone ORDER BY d.zone;
+    </select>
+</mapper>
